@@ -11,6 +11,7 @@ import UIKit
 class RegisterViewController: UIViewController {
 
     var isPWHidden:Bool?
+    var registerSuccess = false
     
     @IBOutlet weak var logoImageView: UIImageView!
     @IBOutlet weak var usernameInput: UITextField!
@@ -39,7 +40,17 @@ class RegisterViewController: UIViewController {
         // validate form
         
         // if not sucess, display message
-        // if success, go back to login screen
+        if !registerSuccess {
+            message.text = "Registration Failed!"
+            message.textColor = #colorLiteral(red: 1, green: 0.1039071781, blue: 0.0251960371, alpha: 1)
+            message.isHidden = false
+        } else {
+            // if success, go back to login screen
+            message.text = "Registration Successful!"
+            message.textColor = #colorLiteral(red: 0.005956960255, green: 0.5896615933, blue: 0.1788459191, alpha: 1)
+            message.isHidden = false
+            performSegue(withIdentifier: "RegisterToLogin", sender: self)
+        }
     }
 
 }

@@ -71,7 +71,12 @@ class LoginViewController: UIViewController {
         if let source = unwindSegue.source as? MainController {
             resetLogin()
         }
-        if let source = unwindSegue.source as? RegisterViewController {
+    }
+    
+    // custom unwind
+    @IBAction func unwindRegistration(segue:UIStoryboardSegue) {
+        if let source = segue.source as? RegisterViewController {
+            print("Unwinded programmatically")
             usernameInput.text = source.usernameInput.text
             passwordInput.text = source.passwordInput.text
             isPWHidden = source.isPWHidden ?? true
