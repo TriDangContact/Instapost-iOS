@@ -27,6 +27,7 @@
 		0B3A8493237AB8370051E4A9 /* CommentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3A8492237AB8370051E4A9 /* CommentViewController.swift */; };
 		0B3A8495237ADC350051E4A9 /* UserPostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3A8494237ADC350051E4A9 /* UserPostViewController.swift */; };
 		0B3A849B237AE4610051E4A9 /* CustomPostCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3A849A237AE4610051E4A9 /* CustomPostCell.swift */; };
+		0B3A849D237AED740051E4A9 /* TagPostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3A849C237AED740051E4A9 /* TagPostViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +74,7 @@
 		0B3A8492237AB8370051E4A9 /* CommentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentViewController.swift; sourceTree = "<group>"; };
 		0B3A8494237ADC350051E4A9 /* UserPostViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPostViewController.swift; sourceTree = "<group>"; };
 		0B3A849A237AE4610051E4A9 /* CustomPostCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPostCell.swift; sourceTree = "<group>"; };
+		0B3A849C237AED740051E4A9 /* TagPostViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagPostViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +135,7 @@
 				0B3A8484237A6F710051E4A9 /* AllUsersViewController.swift */,
 				0B3A8486237A6F830051E4A9 /* AllTagsViewController.swift */,
 				0B3A8494237ADC350051E4A9 /* UserPostViewController.swift */,
+				0B3A849C237AED740051E4A9 /* TagPostViewController.swift */,
 				0B3A848E237AA7460051E4A9 /* PostDetailViewController.swift */,
 				0B3A8492237AB8370051E4A9 /* CommentViewController.swift */,
 				0B3A8454237A57AF0051E4A9 /* Main.storyboard */,
@@ -302,6 +305,7 @@
 				0B3A849B237AE4610051E4A9 /* CustomPostCell.swift in Sources */,
 				0B3A8489237A72800051E4A9 /* RegisterViewController.swift in Sources */,
 				0B3A848F237AA7460051E4A9 /* PostDetailViewController.swift in Sources */,
+				0B3A849D237AED740051E4A9 /* TagPostViewController.swift in Sources */,
 				0B3A847F237A58E70051E4A9 /* LoginViewController.swift in Sources */,
 				0B3A8453237A57AF0051E4A9 /* MainController.swift in Sources */,
 				0B3A8487237A6F830051E4A9 /* AllTagsViewController.swift in Sources */,

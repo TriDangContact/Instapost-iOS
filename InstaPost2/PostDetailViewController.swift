@@ -11,6 +11,7 @@ import UIKit
 class PostDetailViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     var user:String?
+    var tag:String?
     var post:Post?
     var comments = [Comment]()
     
@@ -30,6 +31,8 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     
     func displayPost() {
+        // get the posts depending on if we have username or tag
+        
         postImage.image = UIImage(named: post?.image ?? "")
         rating.image = UIImage(named: post?.rating ?? "")
         username.text = post?.username

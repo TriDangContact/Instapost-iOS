@@ -11,11 +11,6 @@ import UIKit
 class AllUsersViewController: UITableViewController {
 
     var users = [String]()
-    var posts = [
-        Post(id: 0, username: "name1", image: "logo", rating: "stars_5", caption: "caption1", tag: "tag1"),
-        Post(id: 1, username: "name2", image: "logo", rating: "stars_3", caption: "caption2", tag: "tag2"),
-        Post(id: 2, username: "name3", image: "logo", rating: "stars_0", caption: "caption3", tag: "tag3")
-    ]
     
     override func viewDidLoad() {
         super.viewDidLoad()
