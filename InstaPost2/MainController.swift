@@ -1,0 +1,120 @@
+//
+//  ViewController.swift
+//  InstaPost2
+//
+//  Created by Tri Dang on 11/11/19.
+//  Copyright © 2019 Tri Dang. All rights reserved.
+//
+
+import UIKit
+
+class MainController: UITabBarController, UITabBarControllerDelegate {
+
+    var username:String?
+    var password:String?
+    
+    @IBOutlet weak var createPostBtn: UIBarButtonItem!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view.
+        
+        //Assign self for delegate for that ViewController can respond to UITabBarControllerDelegate methods
+        self.delegate = self
+        
+        // disable default NavViewController's back button
+        self.navigationItem.setHidesBackButton(true, animated:true)
+        
+        // get references to each tab
+        guard let viewControllers = self.viewControllers else {
+            print("No view controllers")
+            return
+        }
+        guard
+            let allPostsController = viewControllers[0] as? AllPostsViewController,
+        let allUsersController = viewControllers[1] as? AllUsersViewController,
+        let allTagsViewController = viewControllers[2] as? AllTagsViewController
+        else {
+            print("No view controllers")
+            return
+        }
+        
+        // we can assign any object to each of the tabviewcontroller's tabs here
+        allPostsController.username = username
+        allPostsController.password = password
+        
+//        // we need to stop the timer when app enters background
+//        NotificationCenter.default.addObserver(self, selector: #selector(willResignActive), name: UIApplication.willResignActiveNotification, object: nil)
+//        // start the timer when app enters foreground
+//        NotificationCenter.default.addObserver(self, selector: #selector(didBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+    }
+    
+    // this is where we can call functions based on which tab was selected
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        if let title = viewController.title {
+            if title == "AllPostsViewController" {
+                let view = viewController as? AllPostsViewController
+                //do something here
+            } else if title == "AllUsersViewController" {
+                let view = viewController as? AllUsersViewController
+                //do something here
+            } else if title == "AllTagsViewController" {
+                let view = viewController as? AllTagsViewController
+                //do something here
+            }
+        }
+    }
+    
+    @IBAction func createPost(_ sender: UIBarButtonItem) {
+        performSegue(withIdentifier: "MainToCreate", sender: self)
+    }
+    
+    // pass data from this controller to destination
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "MainToCreate" {
+            let destination = segue.destination as? CreatePostViewController
+            // assign the sender's data to destination's property
+            // this will allow us to highlight courses that were already selected
+            destination?.username = self.username
+            destination?.password = self.password
+        }
+//        else if segue.identifier == "StudentInfotoStudentEdit" {
+//            let destination = segue.destination as? StudentEditViewController
+//            destination?.redid = self.student.redid
+//            destination?.name = self.student.name
+//            destination?.email = self.student.email
+//        }
+    }
+    
+    
+    // using built-in unwind, pass data from source back to this controller
+    @IBAction func back(unwindSegue:UIStoryboardSegue) {
+        if let source = unwindSegue.source as? CreatePostViewController {
+//            self.student.courses = source.coursesSelected
+            print("Back From CreatePostViewController")
+        }
+//        if let source = unwindSegue.source as? StudentEditViewController {
+//            saveData(redid: source.redid, name: source.name, email: source.email)
+//        }
+        
+    }
+    
+    
+    // using custom unwind; pass data from source back to this controller
+    @IBAction func unwindToMain(segue: UIStoryboardSegue) {
+        if let source = segue.source as? CreatePostViewController {
+        //            self.student.courses = source.coursesSelected
+                    print("Back From CreatePostViewController, programmatically")
+            source.username = self.username
+        }
+    }
+    
+    
+    
+    
+}
+
