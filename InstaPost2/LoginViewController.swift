@@ -40,7 +40,7 @@ class LoginViewController: UIViewController {
         
         
         // make sure pw text is hidden
-        passwordInput.isSecureTextEntry = true
+//        passwordInput.isSecureTextEntry = true
         // lets pw input know that there's a button in it
         passwordInput.rightViewMode = .always
         passwordInput.rightView = hidePWBtn

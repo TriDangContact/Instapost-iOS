@@ -16,6 +16,9 @@ class InstaPostAPI {
     var nicknamesExistURL = "https://bismarck.sdsu.edu/api/instapost-query/nickname-exists"
     var newUserURL = "https://bismarck.sdsu.edu/api/instapost-upload/newuser"
     var hashtagsURL = "https://bismarck.sdsu.edu/api/instapost-query/hashtags"
+    var uploadPostURL = "https://bismarck.sdsu.edu/api/instapost-upload/post"
+    var uploadCommentURL = "https://bismarck.sdsu.edu/api/instapost-upload/comment"
+    var uploadRatingURL = "https://bismarck.sdsu.edu/api/instapost-upload/rating"
     
     func getNicknameExistsParameters(nickname:String) -> Parameters {
         return ["nickname":nickname]
@@ -29,11 +32,32 @@ class InstaPostAPI {
                 "password":pw]
     }
     
+    func getUploadPostParameters(email:String, pw:String, text:String, tags:[String]) -> Parameters {
+        return ["email":email, "password":pw, "text":text, "hashtags": tags]
+    }
+    
+    func getUploadCommentParameters(email:String, pw:String, comment:String, postID:Int) -> Parameters {
+        return ["email":email, "password":pw, "comment":comment, "post-id": postID]
+    }
+    
+    func getUploadRatingParameters(email:String, pw:String, rating:Int, postID:Int) -> Parameters {
+        return ["email":email, "password":pw, "rating":rating, "post-id": postID]
+    }
+    
     func convertANYtoString(data: Any, key:String) -> String {
         var result = ""
         let jsonDict:NSDictionary = data as! NSDictionary
         if let value = jsonDict.value(forKey: key) {
             result = value as! String
+        }
+        return result
+    }
+    
+    func convertANYtoInt(data: Any, key:String) -> Int {
+        var result = -1
+        let jsonDict:NSDictionary = data as! NSDictionary
+        if let value = jsonDict.value(forKey: key) {
+            result = value as! Int
         }
         return result
     }

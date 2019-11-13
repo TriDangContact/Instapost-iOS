@@ -46,6 +46,9 @@ class AllPostsViewController: UITableViewController {
         progressBar.progress = 0.0
         progressBar.progress += 0.2
         
+        
+        // TODO: get all posts from the server
+        
         // finish progressbar after request is retrieved
         self.progressBar.setProgress(1.0, animated: true)
         

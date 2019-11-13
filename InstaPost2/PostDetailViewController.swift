@@ -41,12 +41,13 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     
     func getComments() {
-        // use the post's ID to get comments
         comments = [
             Comment(username: "user1", comment: "comment1"),
             Comment(username: "user2", comment: "comment2"),
             Comment(username: "user3", comment: "comment3")
         ]
+        
+        // TODO: use the post's ID to get comments
         
         // need to refresh the table
         commentTableView.reloadData()
@@ -55,8 +56,6 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "PostDetailToComment" {
             let destination = segue.destination as? CommentViewController
-            // assign the sender's data to destination's property
-            // this will allow us to highlight courses that were already selected
             destination?.post = self.post
         }
     }
@@ -68,9 +67,8 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     // custom unwind
     @IBAction func unwindToPostDetail(segue: UIStoryboardSegue) {
         if let source = segue.source as? CommentViewController {
-//          self.student.courses = source.coursesSelected
-            print("Back From CommentViewController, programmatically")
-            // need to refresh comments
+//            print("Back From CommentViewController, programmatically")
+            // refresh comments
             commentTableView.reloadData()
         }
     }
