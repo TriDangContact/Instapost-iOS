@@ -7,16 +7,26 @@
 //
 
 import UIKit
+import Alamofire
 
 class CreatePostViewController: UIViewController {
 
-    var username:String?
+    var email:String?
     var password:String?
+    var api = InstaPostAPI()
+    
+    @IBOutlet weak var apiTesting: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        
 
         // Do any additional setup after loading the view.
+        
+        // user credentials stored in UserDefaults, not ideal
+        email = UserDefaults.standard.string(forKey: "email")
+        password = UserDefaults.standard.string(forKey: "password")
     }
     
     @IBAction func submit(_ sender: Any) {
@@ -25,7 +35,5 @@ class CreatePostViewController: UIViewController {
         
         // custom unwind segue
         performSegue(withIdentifier: "CreateToMain", sender: self)
-        
     }
-    
 }

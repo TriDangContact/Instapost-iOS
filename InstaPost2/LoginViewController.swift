@@ -8,11 +8,14 @@
 
 import Foundation
 import UIKit
+import Alamofire
 
 class LoginViewController: UIViewController {
-
-    var isLoggedIn:Bool = false
+    
     var isPWHidden:Bool = true
+    var email:String?
+    var password:String?
+    var api = InstaPostAPI()
     
     @IBOutlet weak var logoImageView: UIImageView!
     @IBOutlet weak var usernameInput: UITextField!
@@ -20,11 +23,20 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var submitBtn: UIButton!
     @IBOutlet weak var registerBtn: UIButton!
     @IBOutlet weak var hidePWBtn: UIButton!
+    @IBOutlet weak var message: UILabel!
+    @IBOutlet weak var rememberLogin: UISwitch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        // Did the user want to be remembered from last session?
+        let isLoggedIn = UserDefaults.standard.bool(forKey: "isLoggedIn")
+        if isLoggedIn {
+            email = UserDefaults.standard.string(forKey: "email")
+            password = UserDefaults.standard.string(forKey: "password")
+            performSegue(withIdentifier: "LoginToMain", sender: self)
+        }
         
         
         // make sure pw text is hidden
@@ -32,6 +44,8 @@ class LoginViewController: UIViewController {
         // lets pw input know that there's a button in it
         passwordInput.rightViewMode = .always
         passwordInput.rightView = hidePWBtn
+        
+        rememberLogin.isOn = false
     }
 
     
@@ -39,8 +53,21 @@ class LoginViewController: UIViewController {
         passwordInput.isSecureTextEntry.toggle()
     }
     
+    // check credentials and log in
     @IBAction func submit(_ sender: UIButton) {
-        // check credentials and log in
+        // validate inputs
+        guard usernameInput.text == UserDefaults.standard.string(forKey: "username"), passwordInput.text == UserDefaults.standard.string(forKey: "password") else {
+            displayMessage(success: false, message: "Incorrect username/password")
+            return
+        }
+        
+        
+        // if user wants to remember their credentials
+        if rememberLogin.isOn {
+            UserDefaults.standard.set(true, forKey: "isLoggedIn")
+        } else {
+            UserDefaults.standard.set(false, forKey: "isLoggedIn")
+        }
         
         // log in
         performSegue(withIdentifier: "LoginToMain", sender: self)
@@ -56,8 +83,8 @@ class LoginViewController: UIViewController {
             let destination = segue.destination as? MainController
             // assign the sender's data to destination's property
             // this will allow us to highlight courses that were already selected
-            destination?.username = self.usernameInput.text
-            destination?.password = self.passwordInput.text
+            destination?.email = email
+            destination?.password = password
         }
         else if segue.identifier == "LoginToRegister" {
             let destination = segue.destination as? RegisterViewController
@@ -68,7 +95,7 @@ class LoginViewController: UIViewController {
     
     // pass data from source back to this controller
     @IBAction func back(unwindSegue:UIStoryboardSegue) {
-        if let source = unwindSegue.source as? MainController {
+        if unwindSegue.source is MainController {
             resetLogin()
         }
     }
@@ -80,6 +107,7 @@ class LoginViewController: UIViewController {
             usernameInput.text = source.usernameInput.text
             passwordInput.text = source.passwordInput.text
             isPWHidden = source.isPWHidden ?? true
+            message.isHidden = true
         }
     }
     
@@ -87,7 +115,19 @@ class LoginViewController: UIViewController {
         // reset the login forms and data
         usernameInput.text = ""
         passwordInput.text = ""
-        isLoggedIn = false
+        rememberLogin.isOn = false
+        UserDefaults.standard.set(false, forKey: "isLoggedIn")
+    }
+    
+    func displayMessage(success:Bool, message: String) {
+        if success {
+            self.message.textColor = #colorLiteral(red: 0.005956960255, green: 0.5896615933, blue: 0.1788459191, alpha: 1)
+            
+        } else {
+            self.message.textColor = #colorLiteral(red: 1, green: 0.1039071781, blue: 0.0251960371, alpha: 1)
+        }
+        self.message.text = message
+        self.message.isHidden = false
     }
     
     

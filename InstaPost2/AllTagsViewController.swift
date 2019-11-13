@@ -7,20 +7,52 @@
 //
 
 import UIKit
+import Alamofire
 
 class AllTagsViewController: UITableViewController {
 
     var tags = [String]()
+    var api = InstaPostAPI()
+    
+    @IBOutlet weak var progressBar: UIProgressView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         getTagss()
+        
+        // allow user to refresh the list on pulldown
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action:  #selector(refresh), for: .valueChanged)
+        self.refreshControl = refreshControl
     }
     
+    // fetch data from the server
     func getTagss() {
-        tags = ["tag1", "tag2", "tag3"]
+//        tags = ["tag1", "tag2", "tag3"]
+        progressBar.progress = 0.0
+        progressBar.progress += 0.2
+        
+        AF.request(api.hashtagsURL)
+        .validate()
+        .responseJSON { response in
+            switch response.result {
+                case .success(let result):
+                    self.tags = self.api.convertANYtoArray(data: result, key: "hashtags")
+//                    print(self.tags)
+                    
+                    self.tableView.reloadData()
+                    self.progressBar.setProgress(1.0, animated: true)
+                case .failure(let error):
+                    print(error.errorDescription ?? "Server Error: cannot retrieve nicknames")
+            }
+        }
+    }
+    
+    @objc func refresh() {
+        getTagss()
+        refreshControl?.endRefreshing()
     }
     
 
@@ -29,7 +61,7 @@ class AllTagsViewController: UITableViewController {
     }
     //
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return tags.count
     }
         
         

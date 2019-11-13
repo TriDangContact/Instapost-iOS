@@ -10,7 +10,7 @@ import UIKit
 
 class MainController: UITabBarController, UITabBarControllerDelegate {
 
-    var username:String?
+    var email:String?
     var password:String?
     
     @IBOutlet weak var createPostBtn: UIBarButtonItem!
@@ -21,6 +21,9 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
         
         //Assign self for delegate for that ViewController can respond to UITabBarControllerDelegate methods
         self.delegate = self
+        
+//        print("Email in MainController: \(email)")
+//        print("PW in MainController: \(password)")
         
         // disable default NavViewController's back button
         self.navigationItem.setHidesBackButton(true, animated:true)
@@ -40,7 +43,7 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
         }
         
         // we can assign any object to each of the tabviewcontroller's tabs here
-        allPostsController.username = username
+        allPostsController.email = email
         allPostsController.password = password
         
 //        // we need to stop the timer when app enters background
@@ -79,15 +82,9 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
             let destination = segue.destination as? CreatePostViewController
             // assign the sender's data to destination's property
             // this will allow us to highlight courses that were already selected
-            destination?.username = self.username
+            destination?.email = self.email
             destination?.password = self.password
         }
-//        else if segue.identifier == "StudentInfotoStudentEdit" {
-//            let destination = segue.destination as? StudentEditViewController
-//            destination?.redid = self.student.redid
-//            destination?.name = self.student.name
-//            destination?.email = self.student.email
-//        }
     }
     
     
@@ -97,19 +94,14 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
 //            self.student.courses = source.coursesSelected
             print("Back From CreatePostViewController")
         }
-//        if let source = unwindSegue.source as? StudentEditViewController {
-//            saveData(redid: source.redid, name: source.name, email: source.email)
-//        }
-        
     }
     
     
     // using custom unwind; pass data from source back to this controller
     @IBAction func unwindToMain(segue: UIStoryboardSegue) {
         if let source = segue.source as? CreatePostViewController {
-        //            self.student.courses = source.coursesSelected
                     print("Back From CreatePostViewController, programmatically")
-            source.username = self.username
+            source.email = self.email
         }
     }
     

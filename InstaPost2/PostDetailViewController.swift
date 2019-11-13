@@ -31,7 +31,7 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     
     func displayPost() {
-        // get the posts depending on if we have username or tag
+        // get the post using the data that was passed in
         
         postImage.image = UIImage(named: post?.image ?? "")
         rating.image = UIImage(named: post?.rating ?? "")
@@ -65,6 +65,7 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         performSegue(withIdentifier: "PostDetailToComment", sender: self)
     }
     
+    // custom unwind
     @IBAction func unwindToPostDetail(segue: UIStoryboardSegue) {
         if let source = segue.source as? CommentViewController {
 //          self.student.courses = source.coursesSelected
@@ -75,7 +76,6 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     
     // TABLE VIEW TO DISPLAY COMMENTS
-    
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
        return "Comments"
     }

@@ -10,26 +10,51 @@ import Foundation
 import UIKit
 
 class AllPostsViewController: UITableViewController {
-    var username:String?
+    var email:String?
     var password:String?
-    var posts = [
-        Post(id: 0, username: "name1", image: "logo", rating: "stars_5", caption: "caption1", tag: "tag1"),
-        Post(id: 1, username: "name2", image: "logo", rating: "stars_3", caption: "caption2", tag: "tag2"),
-        Post(id: 2, username: "name3", image: "logo", rating: "stars_0", caption: "caption3", tag: "tag3")
-    ]
+    var posts = [Post]()
 
+    @IBOutlet weak var progressBar: UIProgressView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        guard let user = username, let pw = password else {
-            print("data not passed")
-            return
-        }
+//        print("Email in AllPost: \(email)")
+//        print("PW in AllPost: \(password)")
         
         // fix problem where custom cell height is not same as in IB
         tableView.estimatedRowHeight = 555
         tableView.rowHeight = 555
 //        tableView.rowHeight = UITableView.automaticDimension
+        
+        getPosts()
+        
+        // allow user to refresh the list on pulldown
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action:  #selector(refresh), for: .valueChanged)
+        self.refreshControl = refreshControl
+    }
+    
+    // fetch data from the server
+    func getPosts() {
+        posts = [
+            Post(id: 0, username: "name1", image: "logo", rating: "stars_5", caption: "caption1", tag: "tag1"),
+            Post(id: 1, username: "name2", image: "logo", rating: "stars_3", caption: "caption2", tag: "tag2"),
+            Post(id: 2, username: "name3", image: "logo", rating: "stars_0", caption: "caption3", tag: "tag3")
+        ]
+        
+        progressBar.progress = 0.0
+        progressBar.progress += 0.2
+        
+        // finish progressbar after request is retrieved
+        self.progressBar.setProgress(1.0, animated: true)
+        
+        
+    }
+    
+    @objc func refresh() {
+        getPosts()
+        refreshControl?.endRefreshing()
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -37,7 +62,7 @@ class AllPostsViewController: UITableViewController {
     }
 //
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return posts.count
     }
     
     
