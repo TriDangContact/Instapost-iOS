@@ -44,6 +44,7 @@ class AllTagsViewController: UITableViewController {
                     
                     self.tableView.reloadData()
                     self.progressBar.setProgress(1.0, animated: true)
+                // SERVER ERROR
                 case .failure(let error):
                     print(error.errorDescription ?? "Server Error: cannot retrieve nicknames")
             }
@@ -84,5 +85,10 @@ class AllTagsViewController: UITableViewController {
             viewController.tag = selectedTag
             navigationController?.pushViewController(viewController, animated: true)
         }
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
     }
 }

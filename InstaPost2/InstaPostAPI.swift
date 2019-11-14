@@ -17,6 +17,7 @@ class InstaPostAPI {
     var newUserURL = "https://bismarck.sdsu.edu/api/instapost-upload/newuser"
     var hashtagsURL = "https://bismarck.sdsu.edu/api/instapost-query/hashtags"
     var uploadPostURL = "https://bismarck.sdsu.edu/api/instapost-upload/post"
+    var uploadImageURL = "https://bismarck.sdsu.edu/api/instapost-upload/image"
     var uploadCommentURL = "https://bismarck.sdsu.edu/api/instapost-upload/comment"
     var uploadRatingURL = "https://bismarck.sdsu.edu/api/instapost-upload/rating"
     
@@ -34,6 +35,10 @@ class InstaPostAPI {
     
     func getUploadPostParameters(email:String, pw:String, text:String, tags:[String]) -> Parameters {
         return ["email":email, "password":pw, "text":text, "hashtags": tags]
+    }
+    
+    func getUploadImageParameters(email:String, pw:String, image:String, postID:Int) -> Parameters {
+        return ["email":email, "password":pw, "image":image, "post-id": postID]
     }
     
     func getUploadCommentParameters(email:String, pw:String, comment:String, postID:Int) -> Parameters {

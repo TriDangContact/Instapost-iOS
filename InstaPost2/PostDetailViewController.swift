@@ -28,13 +28,14 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         // Do any additional setup after loading the view.
         displayPost()
         getComments()
+        getTags()
     }
     
     func displayPost() {
         // get the post using the data that was passed in
         
-        postImage.image = UIImage(named: post?.image ?? "")
-        rating.image = UIImage(named: post?.rating ?? "")
+        postImage.image = UIImage(named: post?.image ?? "logo")
+        rating.image = UIImage(named: post?.ratingImage ?? "")
         username.text = post?.username
         caption.text = post?.caption
         tagLabel.text = post?.tag
@@ -42,15 +43,20 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     
     func getComments() {
         comments = [
-            Comment(username: "user1", comment: "comment1"),
-            Comment(username: "user2", comment: "comment2"),
-            Comment(username: "user3", comment: "comment3")
+            Comment(username: "user1", comment: "OOOOOOOOOO OOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO OOOOOOO OOOOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOO"),
+            Comment(username: "user2", comment: "OOOOOOOOOO OOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO OOOOOOO OOOOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOO"),
+            Comment(username: "user3", comment: "OOOOOOOOOO OOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO OOOOOOO OOOOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOO")
         ]
+        
         
         // TODO: use the post's ID to get comments
         
         // need to refresh the table
         commentTableView.reloadData()
+    }
+    
+    func getTags() {
+        //TODO: figure out how to display all the tags
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -93,4 +99,11 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         }
        return cell
     }
+    
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
 }
+

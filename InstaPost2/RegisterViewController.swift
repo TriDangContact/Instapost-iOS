@@ -28,6 +28,12 @@ class RegisterViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        // allows dismiss keyboard on tap
+        let tap = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing(_:)))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+
+        
         
         // make sure pw text is hidden
 //        passwordInput.isSecureTextEntry = true
@@ -126,4 +132,9 @@ class RegisterViewController: UIViewController {
         self.message.isHidden = false
     }
 
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
 }

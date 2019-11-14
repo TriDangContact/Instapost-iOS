@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		0B002CD8237BA98F008FF071 /* InstaPostAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B002CD7237BA98F008FF071 /* InstaPostAPI.swift */; };
 		0B002CDA237BE4CB008FF071 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B002CD9237BE4CB008FF071 /* User.swift */; };
+		0B002CDC237CF58B008FF071 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B002CDB237CF58B008FF071 /* ImagePicker.swift */; };
+		0B002CDE237D0009008FF071 /* ImageConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B002CDD237D0009008FF071 /* ImageConversion.swift */; };
 		0B3A844F237A57AF0051E4A9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3A844E237A57AF0051E4A9 /* AppDelegate.swift */; };
 		0B3A8451237A57AF0051E4A9 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3A8450237A57AF0051E4A9 /* SceneDelegate.swift */; };
 		0B3A8453237A57AF0051E4A9 /* MainController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3A8452237A57AF0051E4A9 /* MainController.swift */; };
@@ -56,6 +58,8 @@
 		05DA736D19D9A9685EC45C00 /* Pods-InstaPost2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InstaPost2.debug.xcconfig"; path = "Target Support Files/Pods-InstaPost2/Pods-InstaPost2.debug.xcconfig"; sourceTree = "<group>"; };
 		0B002CD7237BA98F008FF071 /* InstaPostAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstaPostAPI.swift; sourceTree = "<group>"; };
 		0B002CD9237BE4CB008FF071 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		0B002CDB237CF58B008FF071 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		0B002CDD237D0009008FF071 /* ImageConversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageConversion.swift; sourceTree = "<group>"; };
 		0B3A844B237A57AF0051E4A9 /* InstaPost2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InstaPost2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B3A844E237A57AF0051E4A9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0B3A8450237A57AF0051E4A9 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -168,6 +172,8 @@
 				0B002CD9237BE4CB008FF071 /* User.swift */,
 				0B3A849A237AE4610051E4A9 /* CustomPostCell.swift */,
 				0B002CD7237BA98F008FF071 /* InstaPostAPI.swift */,
+				0B002CDB237CF58B008FF071 /* ImagePicker.swift */,
+				0B002CDD237D0009008FF071 /* ImageConversion.swift */,
 			);
 			path = InstaPost2;
 			sourceTree = "<group>";
@@ -455,10 +461,12 @@
 				0B3A8493237AB8370051E4A9 /* CommentViewController.swift in Sources */,
 				0B3A8483237A61820051E4A9 /* AllPostsViewController.swift in Sources */,
 				0B3A8485237A6F710051E4A9 /* AllUsersViewController.swift in Sources */,
+				0B002CDE237D0009008FF071 /* ImageConversion.swift in Sources */,
 				0B3A8495237ADC350051E4A9 /* UserPostViewController.swift in Sources */,
 				0B3A849B237AE4610051E4A9 /* CustomPostCell.swift in Sources */,
 				0B3A8489237A72800051E4A9 /* RegisterViewController.swift in Sources */,
 				0B3A848F237AA7460051E4A9 /* PostDetailViewController.swift in Sources */,
+				0B002CDC237CF58B008FF071 /* ImagePicker.swift in Sources */,
 				0B3A849D237AED740051E4A9 /* TagPostViewController.swift in Sources */,
 				0B3A847F237A58E70051E4A9 /* LoginViewController.swift in Sources */,
 				0B3A8453237A57AF0051E4A9 /* MainController.swift in Sources */,

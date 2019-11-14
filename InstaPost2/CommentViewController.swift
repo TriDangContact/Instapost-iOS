@@ -21,11 +21,18 @@ class CommentViewController: UIViewController {
     @IBOutlet weak var commentInput: UITextField!
     @IBOutlet weak var ratingSlider: UISlider!
     @IBOutlet weak var ratingLabel: UILabel!
+    @IBOutlet weak var message: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        // allows dismiss keyboard on tap
+        let tap = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing(_:)))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+
+        
         
         // making sure rating label matches slider
         ratingLabel.text = String(Int(ratingSlider.value / ratingStep) + 1)
@@ -34,7 +41,7 @@ class CommentViewController: UIViewController {
         email = UserDefaults.standard.string(forKey: "email")
         password = UserDefaults.standard.string(forKey: "password")
         
-        postImage.image = UIImage(named: post?.image ?? "")
+        postImage.image = UIImage(named: post?.image ?? "logo")
     }
     
     // calculate the rating based on our interval, setting the ratingLabel, and upload the rating to the server
@@ -54,10 +61,11 @@ class CommentViewController: UIViewController {
             return
         }
         guard !comment.isEmpty else {
+            self.displayMessage(success: false, message: "Comment cannot be empty")
             return
         }
                 
-        //TODO: post the comment to the server
+        // Post the comment to the server
         // temporary email
         email = "td2@td.com"
         
@@ -75,16 +83,17 @@ class CommentViewController: UIViewController {
                         let errorMessage = self.api.convertANYtoString(data: result, key: "errors")
                         guard message != "fail" else {
                             // UPLOAD FAIL
-//                            self.displayMessage(success: false, message: errorMessage)
-                            print(errorMessage)
+                            self.displayMessage(success: false, message: errorMessage)
+//                            print(errorMessage)
                             return
                         }
                         // Upload SUCCESS
                         self.performSegue(withIdentifier: "CommentToPostDetail", sender: self)
-                        
+                    
+                    // SERVER ERROR
                     case .failure(let error):
-                        print(error.errorDescription ?? "Server Error: Cannot Post")
-//                        self.displayMessage(success: false, message: error.errorDescription ?? "Server Error: Cannot Post")
+//                        print(error.errorDescription ?? "Server Error: Cannot Post")
+                        self.displayMessage(success: false, message: error.errorDescription ?? "Server Error: Cannot Post Comment")
                 }
             }
     }
@@ -108,16 +117,33 @@ class CommentViewController: UIViewController {
                         let errorMessage = self.api.convertANYtoString(data: result, key: "errors")
                         guard message != "fail" else {
                             // UPLOAD FAIL
-//                            self.displayMessage(success: false, message: errorMessage)
-                            print(errorMessage)
+                            self.displayMessage(success: false, message: errorMessage)
+//                            print(errorMessage)
                             return
                         }
                         // Upload SUCCESS
-                        
+                        self.displayMessage(success: true, message: "Rating Updated")
+                    
                     case .failure(let error):
-                        print(error.errorDescription ?? "Server Error: Cannot Post")
-//                        self.displayMessage(success: false, message: error.errorDescription ?? "Server Error: Cannot Post")
+//                        print(error.errorDescription ?? "Server Error: Cannot Post")
+                        self.displayMessage(success: false, message: error.errorDescription ?? "Server Error: Cannot Post Rating")
                 }
             }
+    }
+    
+    func displayMessage(success:Bool, message: String) {
+        if success {
+            self.message.textColor = #colorLiteral(red: 0.005956960255, green: 0.5896615933, blue: 0.1788459191, alpha: 1)
+            
+        } else {
+            self.message.textColor = #colorLiteral(red: 1, green: 0.1039071781, blue: 0.0251960371, alpha: 1)
+        }
+        self.message.text = message
+        self.message.isHidden = false
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
     }
 }

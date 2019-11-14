@@ -28,6 +28,9 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
         // disable default NavViewController's back button
         self.navigationItem.setHidesBackButton(true, animated:true)
         
+        // set the nav title to a custom image
+//        self.navigationItem.titleView = UIImageView(image: UIImage(named: "instapost-logo"))
+        
         // get references to each tab
         guard let viewControllers = self.viewControllers else {
             print("No view controllers")
@@ -43,13 +46,13 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
         }
         
         // we can assign any object to each of the tabviewcontroller's tabs here
-        allPostsController.email = email
-        allPostsController.password = password
+//        allPostsController.email = email
+//        allPostsController.password = password
+//        allUsersController.email = email
+//        allUsersController.password = password
+//        allTagsController.email = email
+//        allTagsController.password = password
         
-//        // we need to stop the timer when app enters background
-//        NotificationCenter.default.addObserver(self, selector: #selector(willResignActive), name: UIApplication.willResignActiveNotification, object: nil)
-//        // start the timer when app enters foreground
-//        NotificationCenter.default.addObserver(self, selector: #selector(didBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -101,11 +104,15 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
     @IBAction func unwindToMain(segue: UIStoryboardSegue) {
         if let source = segue.source as? CreatePostViewController {
                     print("Back From CreatePostViewController, programmatically")
-            source.email = self.email
+//            source.email = self.email
+            
         }
     }
     
-    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
     
     
 }

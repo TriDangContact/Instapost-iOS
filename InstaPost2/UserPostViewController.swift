@@ -19,6 +19,8 @@ class UserPostViewController: UITableViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
+        self.navigationItem.title = user
         getPosts()
         
         // allow user to refresh the list on pulldown
@@ -30,9 +32,9 @@ class UserPostViewController: UITableViewController {
     // fetch data from the server
     func getPosts() {
         posts = [
-            Post(id: 0, username: "name1", image: "logo", rating: "stars_5", caption: "caption1", tag: "tag1"),
-            Post(id: 1, username: "name1", image: "logo", rating: "stars_3", caption: "caption2", tag: "tag2"),
-            Post(id: 2, username: "name1", image: "logo", rating: "stars_0", caption: "caption3", tag: "tag3")
+            Post(id: 0, username: "name1", image: "logo", rating: 5, caption: "caption1", tag: "tag1"),
+            Post(id: 1, username: "name1", image: "logo", rating: 3, caption: "caption2", tag: "tag2"),
+            Post(id: 2, username: "name1", image: "logo", rating: 1, caption: "caption3", tag: "tag3")
         ]
         
         progressBar.progress = 0.0
@@ -68,8 +70,8 @@ class UserPostViewController: UITableViewController {
             cell.username.text = post.username
             cell.caption.text = post.caption
             cell.tagLabel.text = post.tag
-            cell.postImage.image = UIImage(named: post.image ?? "")
-            cell.rating.image = UIImage(named: post.rating ?? "")
+            cell.postImage.image = UIImage(named: post.image ?? "logo")
+            cell.rating.image = UIImage(named: post.ratingImage)
         }
         return cell
     }
@@ -84,6 +86,9 @@ class UserPostViewController: UITableViewController {
         }
     }
     
-    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
 
 }
