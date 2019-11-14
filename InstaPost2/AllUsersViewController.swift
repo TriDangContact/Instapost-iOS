@@ -10,9 +10,9 @@ import UIKit
 import Alamofire
 
 class AllUsersViewController: UITableViewController {
-
+    
+    let api = InstaPostAPI()
     var users = [String]()
-    var api = InstaPostAPI()
     
     @IBOutlet weak var progressBar: UIProgressView!
     
@@ -39,7 +39,7 @@ class AllUsersViewController: UITableViewController {
         .responseJSON { response in
             switch response.result {
                 case .success(let result):
-                    self.users = self.api.convertANYtoArray(data: result, key: "nicknames")
+                    self.users = self.api.convertANYtoSTRINGArray(data: result, key: "nicknames")
 //                    print(self.users)
                     
                     self.tableView.reloadData()
@@ -55,14 +55,15 @@ class AllUsersViewController: UITableViewController {
         refreshControl?.endRefreshing()
     }
     
+    
+    // TABLEVIEW HANDLING
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-    //
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return users.count
     }
-        
         
     // displaying each cell in the table
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

@@ -11,11 +11,13 @@ import Alamofire
 
 class CommentViewController: UIViewController {
 
+    let api = InstaPostAPI()
+    let imageConverter = ImageConversion()
+    let ratingStep:Float = 5
     var email:String?
     var password:String?
     var post:Post?
-    var ratingStep:Float = 5
-    var api = InstaPostAPI()
+    var submittedComment = ""
     
     @IBOutlet weak var postImage: UIImageView!
     @IBOutlet weak var commentInput: UITextField!
@@ -31,8 +33,6 @@ class CommentViewController: UIViewController {
         let tap = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing(_:)))
         tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
-
-        
         
         // making sure rating label matches slider
         ratingLabel.text = String(Int(ratingSlider.value / ratingStep) + 1)
@@ -41,7 +41,16 @@ class CommentViewController: UIViewController {
         email = UserDefaults.standard.string(forKey: "email")
         password = UserDefaults.standard.string(forKey: "password")
         
-        postImage.image = UIImage(named: post?.image ?? "logo")
+        if let imageSrc = post?.image {
+            let image:UIImage = imageConverter.ToImage(imageBase64String: imageSrc)
+            postImage.image = image
+        }
+        else {
+            postImage.image = UIImage(named: post?.image ?? "logo")
+        }
+        
+        // let the comment box get focus
+        commentInput.becomeFirstResponder()
     }
     
     // calculate the rating based on our interval, setting the ratingLabel, and upload the rating to the server
@@ -64,7 +73,11 @@ class CommentViewController: UIViewController {
             self.displayMessage(success: false, message: "Comment cannot be empty")
             return
         }
-                
+        
+        guard let rating = Int(ratingLabel.text ?? "-1") else {
+            return
+        }
+        uploadRating(rating: rating)
         // Post the comment to the server
         // temporary email
         email = "td2@td.com"
@@ -74,13 +87,14 @@ class CommentViewController: UIViewController {
         }
         
         let parameters = api.getUploadCommentParameters(email: possibleEmail, pw: pw, comment:comment, postID: postID)
+        print("Uploading Comment: email = \(possibleEmail), pw = \(pw), comment = \(comment), postid = \(postID)")
         AF.request(api.uploadCommentURL, method: .post, parameters: parameters, encoding: JSONEncoding.default)
             .validate()
             .responseJSON { response in
                 switch response.result {
                     case .success(let result):
-                        let message = self.api.convertANYtoString(data: result, key: "result")
-                        let errorMessage = self.api.convertANYtoString(data: result, key: "errors")
+                        let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                        let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
                         guard message != "fail" else {
                             // UPLOAD FAIL
                             self.displayMessage(success: false, message: errorMessage)
@@ -88,6 +102,9 @@ class CommentViewController: UIViewController {
                             return
                         }
                         // Upload SUCCESS
+                        
+                        // workaround to let us update the comment section in PostDetail
+                        self.submittedComment = comment
                         self.performSegue(withIdentifier: "CommentToPostDetail", sender: self)
                     
                     // SERVER ERROR
@@ -113,8 +130,8 @@ class CommentViewController: UIViewController {
             .responseJSON { response in
                 switch response.result {
                     case .success(let result):
-                        let message = self.api.convertANYtoString(data: result, key: "result")
-                        let errorMessage = self.api.convertANYtoString(data: result, key: "errors")
+                        let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                        let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
                         guard message != "fail" else {
                             // UPLOAD FAIL
                             self.displayMessage(success: false, message: errorMessage)

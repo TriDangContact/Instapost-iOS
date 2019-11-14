@@ -33,13 +33,12 @@ class RegisterViewController: UIViewController {
         tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
 
-        
-        
-        // make sure pw text is hidden
-//        passwordInput.isSecureTextEntry = true
         // lets pw input know that there's a button in it
         passwordInput.rightViewMode = .always
         passwordInput.rightView = hidePWBtn
+        
+        // let the username box get focus
+        usernameInput.becomeFirstResponder()
     }
     
     @IBAction func toggleHidePW(_ sender: UIButton) {
@@ -97,8 +96,8 @@ class RegisterViewController: UIViewController {
             .responseJSON { response in
                 switch response.result {
                 case .success(let result):
-                    let message = self.api.convertANYtoString(data: result, key: "result")
-                    let errorMessage = self.api.convertANYtoString(data: result, key: "errors")
+                    let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                    let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
                     guard message != "fail" else {
                         // REGISTRATION FAIL
                         self.displayMessage(success: false, message: errorMessage)

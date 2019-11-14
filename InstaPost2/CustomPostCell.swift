@@ -15,4 +15,5 @@ class CustomPostCell: UITableViewCell {
     @IBOutlet weak var caption: UILabel!
     @IBOutlet weak var rating: UIImageView!
     @IBOutlet weak var tagLabel: UILabel!
+    @IBOutlet weak var ratingCount: UILabel!
 }

@@ -11,8 +11,8 @@ import Alamofire
 
 class AllTagsViewController: UITableViewController {
 
+    let api = InstaPostAPI()
     var tags = [String]()
-    var api = InstaPostAPI()
     
     @IBOutlet weak var progressBar: UIProgressView!
     
@@ -39,7 +39,7 @@ class AllTagsViewController: UITableViewController {
         .responseJSON { response in
             switch response.result {
                 case .success(let result):
-                    self.tags = self.api.convertANYtoArray(data: result, key: "hashtags")
+                    self.tags = self.api.convertANYtoSTRINGArray(data: result, key: "hashtags")
 //                    print(self.tags)
                     
                     self.tableView.reloadData()
@@ -57,14 +57,14 @@ class AllTagsViewController: UITableViewController {
     }
     
 
+    // TABLEVIEW HANDLING
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-    //
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tags.count
     }
-        
         
     // displaying each cell in the table
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

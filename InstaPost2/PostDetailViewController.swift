@@ -10,10 +10,11 @@ import UIKit
 
 class PostDetailViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
+    let imageConverter = ImageConversion()
     var user:String?
     var tag:String?
     var post:Post?
-    var comments = [Comment]()
+    var comments = [String]()
     
     @IBOutlet weak var commentTableView: UITableView!
     @IBOutlet weak var postImage: UIImageView!
@@ -21,11 +22,13 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     @IBOutlet weak var username: UILabel!
     @IBOutlet weak var caption: UILabel!
     @IBOutlet weak var tagLabel: UILabel!
+    @IBOutlet weak var ratingCountLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
         displayPost()
         getComments()
         getTags()
@@ -33,24 +36,32 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     
     func displayPost() {
         // get the post using the data that was passed in
-        
-        postImage.image = UIImage(named: post?.image ?? "logo")
         rating.image = UIImage(named: post?.ratingImage ?? "")
-        username.text = post?.username
-        caption.text = post?.caption
-        tagLabel.text = post?.tag
+        ratingCountLabel.text = "\(post?.ratingCount ?? 0) Ratings"
+        username.text = user
+        caption.text = post?.text
+        
+        if let imageSrc = post?.image {
+            let image:UIImage = imageConverter.ToImage(imageBase64String: imageSrc)
+            postImage.image = image
+        }
+        else {
+            postImage.image = UIImage(named: post?.image ?? "logo")
+        }
+        
+        //TODO: need to implement
+        // placeholder tag until proper hashtag display is implemented
+        tagLabel.text = "tag"
+//        tagLabel.text = post?.hashtags
+        
     }
     
     func getComments() {
-        comments = [
-            Comment(username: "user1", comment: "OOOOOOOOOO OOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO OOOOOOO OOOOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOO"),
-            Comment(username: "user2", comment: "OOOOOOOOOO OOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO OOOOOOO OOOOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOO"),
-            Comment(username: "user3", comment: "OOOOOOOOOO OOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO OOOOOOO OOOOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOOOOOOO OOOOOOOOOOOOOO")
-        ]
+        guard let possiblePost = post else {
+            return
+        }
         
-        
-        // TODO: use the post's ID to get comments
-        
+        comments = possiblePost.comments
         // need to refresh the table
         commentTableView.reloadData()
     }
@@ -73,11 +84,15 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     // custom unwind
     @IBAction func unwindToPostDetail(segue: UIStoryboardSegue) {
         if let source = segue.source as? CommentViewController {
-//            print("Back From CommentViewController, programmatically")
             // refresh comments
-            commentTableView.reloadData()
+            // workaround to get the submitted comment, so we don't have to request it from server
+            if !source.submittedComment.isEmpty {
+                post?.comments.append(source.submittedComment)
+                getComments()
+            }
         }
     }
+    
     
     // TABLE VIEW TO DISPLAY COMMENTS
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -94,8 +109,7 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     
         if !comments.isEmpty {
             let comment = comments[indexPath.row]
-            cell.textLabel?.text = comment.username
-            cell.detailTextLabel?.text = comment.comment
+            cell.textLabel?.text = comment
         }
        return cell
     }

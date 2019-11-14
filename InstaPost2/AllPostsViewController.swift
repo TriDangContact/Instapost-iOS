@@ -8,13 +8,18 @@
 
 import Foundation
 import UIKit
+import Alamofire
 
 class AllPostsViewController: UITableViewController {
 //    var email:String?
 //    var password:String?
+    let api = InstaPostAPI()
+    let imageConverter = ImageConversion()
     var posts = [Post]()
+    
 
     @IBOutlet weak var progressBar: UIProgressView!
+    @IBOutlet weak var ratingCountLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,9 +43,11 @@ class AllPostsViewController: UITableViewController {
     // fetch data from the server
     func getPosts() {
         posts = [
-            Post(id: 0, username: "name1", image: "logo", rating: 5, caption: "caption1", tag: "tag1"),
-            Post(id: 1, username: "name2", image: "logo", rating: 3, caption: "caption2", tag: "tag2"),
-            Post(id: 2, username: "name3", image: "logo", rating: 1, caption: "caption3", tag: "tag3")
+            Post(id: 0, username: "name1", image: "logo", rating: 3.5, ratingCount: 5, text: "caption1", hashtags: ["#tag1","tag2"], comments: ["comment1", "comment2"]),
+            Post(id: 1, username: "name2", image: "logo", rating: 5, ratingCount: 5, text: "caption2", hashtags: ["#tag1","tag2"], comments: ["comment1", "comment2"]),
+            Post(id: 2, username: "name3", image: "logo", rating: -1, ratingCount: 5, text: "caption3", hashtags: ["#tag1","tag2"], comments: ["comment1", "comment2"]),
+            Post(id: 3, username: "name4", image: "logo", rating: 1, ratingCount: 5, text: "caption4", hashtags: ["#tag1","tag2"], comments: ["comment1", "comment2"]),
+            Post(id: 4, username: "name5", image: "logo", rating: 4, ratingCount: 5, text: "caption5", hashtags: ["#tag1","tag2"], comments: ["comment1", "comment2"]),
         ]
         
         progressBar.progress = 0.0
@@ -60,14 +67,15 @@ class AllPostsViewController: UITableViewController {
         refreshControl?.endRefreshing()
     }
 
+    
+    // TABLEVIEW HANDLING
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-//
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return posts.count
     }
-    
     
     // displaying each cell in the table
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -76,10 +84,15 @@ class AllPostsViewController: UITableViewController {
         if !posts.isEmpty {
             let post = posts[indexPath.row]
             cell.username.text = post.username
-            cell.caption.text = post.caption
-            cell.tagLabel.text = post.tag
+            cell.caption.text = post.text
+            
+            // TODO: need to implement
+            // placeholder tag until proper hashtag display is implemented
+            cell.tagLabel.text = "tag"
+//            cell.tagLabel.text = post.hashtags
             cell.postImage.image = UIImage(named: post.image ?? "logo")
             cell.rating.image = UIImage(named: post.ratingImage)
+            cell.ratingCount.text = "\(post.ratingCount) Ratings"
         }
         return cell
     }
@@ -89,6 +102,7 @@ class AllPostsViewController: UITableViewController {
         let selectedPost = posts[indexPath.row]
         
         if let viewController = storyboard?.instantiateViewController(identifier: "PostDetailViewController") as? PostDetailViewController {
+            viewController.user = selectedPost.username
             viewController.post = selectedPost
             navigationController?.pushViewController(viewController, animated: true)
         }

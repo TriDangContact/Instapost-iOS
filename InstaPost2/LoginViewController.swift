@@ -35,7 +35,7 @@ class LoginViewController: UIViewController {
         tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
         
-        // Did the user want to be remembered from last session?
+        // Did the user want to be remembered from last session? If yes, let them through
         let isLoggedIn = UserDefaults.standard.bool(forKey: "isLoggedIn")
         if isLoggedIn {
             email = UserDefaults.standard.string(forKey: "email")
@@ -43,14 +43,14 @@ class LoginViewController: UIViewController {
             performSegue(withIdentifier: "LoginToMain", sender: self)
         }
         
-        
-        // make sure pw text is hidden
-//        passwordInput.isSecureTextEntry = true
         // lets pw input know that there's a button in it
         passwordInput.rightViewMode = .always
         passwordInput.rightView = hidePWBtn
         
         rememberLogin.isOn = false
+        
+        // let the username box get focus
+        usernameInput.becomeFirstResponder()
     }
 
     

@@ -43,9 +43,8 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
         
     }
     
-    // TODO: need to handle image picker
+    // allow user to pick image
     @IBAction func pickImage(_ sender: UIButton) {
-        print("Select an Image")
         self.imagePicker.present(from: sender)
     }
     
@@ -99,9 +98,9 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
             .responseJSON { response in
                 switch response.result {
                     case .success(let result):
-                        let message = self.api.convertANYtoString(data: result, key: "result")
-                        let postID = self.api.convertANYtoInt(data: result, key: "id")
-                        let errorMessage = self.api.convertANYtoString(data: result, key: "errors")
+                        let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                        let postID = self.api.convertANYtoINT(data: result, key: "id")
+                        let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
                         guard message != "fail" else {
                             // REGISTRATION FAIL
                             self.displayMessage(success: false, message: errorMessage)
@@ -109,8 +108,6 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
                         }
                         
                         // Post SUCCESS
-                        
-                        // TODO: upload image to post
                         // we can how use the generated post ID to upload it's image
                         self.uploadImageToPost(email: email, password: password, postID: postID)
                         
@@ -121,10 +118,9 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     
     
-    // TODO: need to implement
+    // immediately called after we have uploaded a post and given a postID
     func uploadImageToPost(email:String, password:String, postID:Int) {
         print("PostID: \(postID)")
-        
         
         guard imageView.image != nil else {
             self.displayMessage(success: false, message: "Please choose an image")
@@ -138,19 +134,18 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
         let imageConverter = ImageConversion()
         let imageString = imageConverter.ToBase64String(img: image)
         
-        // TODO: upload image to post on server
-        
+        // upload image to post on server
         let parameters = api.getUploadImageParameters(email: email, pw: password, image:imageString, postID: postID)
-                AF.request(api.uploadCommentURL, method: .post, parameters: parameters, encoding: JSONEncoding.default)
+                AF.request(api.uploadImageURL, method: .post, parameters: parameters, encoding: JSONEncoding.default)
                     .validate()
                     .responseJSON { response in
                         switch response.result {
                             case .success(let result):
-                                let message = self.api.convertANYtoString(data: result, key: "result")
-                                let errorMessage = self.api.convertANYtoString(data: result, key: "errors")
+                                let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                                let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
                                 guard message != "fail" else {
                                     // UPLOAD FAIL
-                                    self.displayMessage(success: false, message: errorMessage)
+                                    self.displayMessage(success: false, message: "UPLOAD FAIL: \(errorMessage)")
                                     print(errorMessage)
                                     return
                                 }
@@ -158,14 +153,25 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
                                 // Upload SUCCESS
                                 // finish progressbar after request is retrieved
                                 self.progressBar.setProgress(1.0, animated: true)
-                                // custom unwind segue
                                 self.displayMessage(success: true, message: "Upload Successful!")
-                                self.performSegue(withIdentifier: "CreateToMain", sender: self)
+                                // give a small delay so user can see successful posting
+                                var countdown = 3
+                                let timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+                                    countdown-=1
+                                    if countdown == 0 {
+                                        timer.invalidate()
+                                        // custom unwind segue
+                                        self.performSegue(withIdentifier: "CreateToMain", sender: self)
+                                    }
+                                }
+                                
+                                
+                                
                                 
                             // SERVER ERROR
                             case .failure(let error):
-                                print(error.errorDescription ?? "Server Error: Cannot Post")
-                                self.displayMessage(success: false, message: error.errorDescription ?? "Server Error: Cannot Post")
+//                                print(error.errorDescription ?? "Server Error: Cannot Post")
+                                self.displayMessage(success: false, message: "SERVER ERROR: \(String(describing: error.errorDescription))")
                         }
                     }
     }
