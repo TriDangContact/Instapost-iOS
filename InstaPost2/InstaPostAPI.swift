@@ -17,6 +17,7 @@ class InstaPostAPI {
     var newUserURL = "https://bismarck.sdsu.edu/api/instapost-upload/newuser"
     var hashtagsURL = "https://bismarck.sdsu.edu/api/instapost-query/hashtags"
     var postFromIdURL = "https://bismarck.sdsu.edu/api/instapost-query/post"
+    var imageFromIdURL = "https://bismarck.sdsu.edu/api/instapost-query/image"
     var uploadPostURL = "https://bismarck.sdsu.edu/api/instapost-upload/post"
     var uploadImageURL = "https://bismarck.sdsu.edu/api/instapost-upload/image"
     var uploadCommentURL = "https://bismarck.sdsu.edu/api/instapost-upload/comment"
@@ -24,6 +25,8 @@ class InstaPostAPI {
     
     var nicknamePostsURL = "https://bismarck.sdsu.edu/api/instapost-query/nickname-post-ids"
     var hashtagPostsURL = "https://bismarck.sdsu.edu/api/instapost-query/hashtags-post-ids"
+    
+    
     
     func getNicknameExistsParameters(nickname:String) -> Parameters {
         return ["nickname":nickname]
@@ -47,6 +50,10 @@ class InstaPostAPI {
     
     func getPostFromIdParameters(postID:Int) -> Parameters {
         return ["post-id":postID]
+    }
+    
+    func getImageFromIdParameters(imageID:Int) -> Parameters {
+        return ["id":imageID]
     }
     
     func getUploadPostParameters(email:String, pw:String, text:String, tags:[String]) -> Parameters {
@@ -110,7 +117,7 @@ class InstaPostAPI {
                 post.hashtags = hashtags as! [String]
             }
             if let image = postDict.value(forKey: "image") {
-                post.image = image as? String
+                post.image = image as! Int
             }
             if let text = postDict.value(forKey: "text") {
                 post.text = text as! String

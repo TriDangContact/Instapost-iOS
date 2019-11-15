@@ -43,11 +43,11 @@ class AllPostsViewController: UITableViewController {
     // fetch data from the server
     func getPosts() {
         posts = [
-            Post(id: 0, username: "name1", image: "logo", rating: 3.5, ratingCount: 5, text: "caption1", hashtags: ["#tag1","tag2"], comments: ["comment1", "comment2"]),
-            Post(id: 1, username: "name2", image: "logo", rating: 5, ratingCount: 5, text: "caption2", hashtags: ["#tag1","tag2"], comments: ["comment1", "comment2"]),
-            Post(id: 2, username: "name3", image: "logo", rating: -1, ratingCount: 5, text: "caption3", hashtags: ["#tag1","tag2"], comments: ["comment1", "comment2"]),
-            Post(id: 3, username: "name4", image: "logo", rating: 1, ratingCount: 5, text: "caption4", hashtags: ["#tag1","tag2"], comments: ["comment1", "comment2"]),
-            Post(id: 4, username: "name5", image: "logo", rating: 4, ratingCount: 5, text: "caption5", hashtags: ["#tag1","tag2"], comments: ["comment1", "comment2"]),
+            Post(id: 0, username: "name1", rating: 3.5, ratingCount: 5, text: "caption1", hashtags: ["#tag1","tag2"], comments: ["comment1", "comment2"]),
+            Post(id: 1, username: "name2", rating: 5, ratingCount: 5, text: "caption2", hashtags: ["#tag1","tag2"], comments: ["comment1", "comment2"]),
+            Post(id: 2, username: "name3", rating: -1, ratingCount: 5, text: "caption3", hashtags: ["#tag1","tag2"], comments: ["comment1", "comment2"]),
+            Post(id: 3, username: "name4", rating: 1, ratingCount: 5, text: "caption4", hashtags: ["#tag1","tag2"], comments: ["comment1", "comment2"]),
+            Post(id: 4, username: "name5", rating: 4, ratingCount: 5, text: "caption5", hashtags: ["#tag1","tag2"], comments: ["comment1", "comment2"]),
         ]
         
         progressBar.progress = 0.0
@@ -85,14 +85,23 @@ class AllPostsViewController: UITableViewController {
             let post = posts[indexPath.row]
             cell.username.text = post.username
             cell.caption.text = post.text
-            
+            cell.rating.image = UIImage(named: post.ratingImage)
+            cell.ratingCount.text = "\(post.ratingCount) Ratings"
             // TODO: need to implement
             // placeholder tag until proper hashtag display is implemented
             cell.tagLabel.text = "tag"
 //            cell.tagLabel.text = post.hashtags
-            cell.postImage.image = UIImage(named: post.image ?? "logo")
-            cell.rating.image = UIImage(named: post.ratingImage)
-            cell.ratingCount.text = "\(post.ratingCount) Ratings"
+            
+            
+            // some checking to make sure we display proper image
+            if !post.imageBase64.isEmpty {
+                let image:UIImage = imageConverter.ToImage(imageBase64String: post.imageBase64)
+                cell.postImage.image = image
+            }
+            else {
+                cell.postImage.image = UIImage(named: "no_image_light")
+            }
+            
         }
         return cell
     }

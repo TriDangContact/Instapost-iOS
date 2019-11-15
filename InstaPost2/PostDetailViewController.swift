@@ -36,17 +36,22 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     
     func displayPost() {
         // get the post using the data that was passed in
-        rating.image = UIImage(named: post?.ratingImage ?? "")
-        ratingCountLabel.text = "\(post?.ratingCount ?? 0) Ratings"
+        guard let realPost = post else {
+           return
+        }
+        
+        rating.image = UIImage(named: realPost.ratingImage )
+        ratingCountLabel.text = "\(realPost.ratingCount ) Ratings"
         username.text = user
         caption.text = post?.text
         
-        if let imageSrc = post?.image {
-            let image:UIImage = imageConverter.ToImage(imageBase64String: imageSrc)
+        // some checking to make sure we display proper image
+        if !realPost.imageBase64.isEmpty {
+            let image:UIImage = imageConverter.ToImage(imageBase64String: realPost.imageBase64)
             postImage.image = image
         }
         else {
-            postImage.image = UIImage(named: post?.image ?? "logo")
+            postImage.image = UIImage(named: "no_image_light")
         }
         
         //TODO: need to implement

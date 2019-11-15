@@ -41,12 +41,16 @@ class CommentViewController: UIViewController {
         email = UserDefaults.standard.string(forKey: "email")
         password = UserDefaults.standard.string(forKey: "password")
         
-        if let imageSrc = post?.image {
-            let image:UIImage = imageConverter.ToImage(imageBase64String: imageSrc)
+        guard let realPost = post else {
+            return
+        }
+        // some checking to make sure we display proper image
+        if !realPost.imageBase64.isEmpty {
+            let image:UIImage = imageConverter.ToImage(imageBase64String: realPost.imageBase64)
             postImage.image = image
         }
         else {
-            postImage.image = UIImage(named: post?.image ?? "logo")
+            postImage.image = UIImage(named: "logo")
         }
         
         // let the comment box get focus

@@ -35,12 +35,13 @@ class TagPostViewController: UITableViewController {
         self.refreshControl = refreshControl
     }
     
+    
+    //--------------------START POST DOWNLOAD--------------------------
     // we need to download all of the user's postIDs, before we can retrieve each post
     func getPostIDs() {
         progressBar.progress = 0.0
         progressBar.progress += 0.2
                 
-        // TODO: get all posts from the server based on username
         guard let hashtag = tag else {
             return
         }
@@ -55,7 +56,6 @@ class TagPostViewController: UITableViewController {
                             let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
                             guard message != "fail" else {
                                 // DOWNLOAD FAIL
-//                                self.displayMessage(success: false, message: errorMessage)
                                 print(errorMessage)
                                 return
                             }
@@ -67,7 +67,6 @@ class TagPostViewController: UITableViewController {
                         // SERVER ERROR
                         case .failure(let error):
                             print(error.errorDescription ?? "Server Error: Cannot Retrieve PostIDs")
-//                            self.displayMessage(success: false, message: error.errorDescription ?? "Server Error: Cannot Post Comment")
                     }
                 }
     }
@@ -81,37 +80,70 @@ class TagPostViewController: UITableViewController {
         
         for id in postIDs {
             let parameters = api.getPostFromIdParameters(postID: id)
-                    AF.request(api.postFromIdURL, parameters: parameters)
-                            .validate()
-                            .responseJSON { response in
-                                switch response.result {
-                                    case .success(let result):
-                                        let message = self.api.convertANYtoSTRING(data: result, key: "result")
-                                        let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
-                                        guard message != "fail" else {
-                                            // DOWNLOAD FAIL
-            //                                self.displayMessage(success: false, message: errorMessage)
-                                            print(errorMessage)
-                                            return
-                                        }
-                                        // DOWNLOAD SUCCESS
-                                        let post = self.api.convertANYtoPOST(data: result, key: "post")
-                                        
-                                        // we add each post we downloaded into our collection
-                                        self.posts.append(post)
-                                        // update the table each time a post gets downloaded
-                                        self.tableView.reloadData()
-
-                                    // SERVER ERROR
-                                    case .failure(let error):
-                                        print(error.errorDescription ?? "Server Error: Cannot Retrieve Post")
-            //                            self.displayMessage(success: false, message: error.errorDescription ?? "Server Error: Cannot Post Comment")
+            AF.request(api.postFromIdURL, parameters: parameters)
+                    .validate()
+                    .responseJSON { response in
+                        switch response.result {
+                            case .success(let result):
+                                let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                                let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
+                                guard message != "fail" else {
+                                    // DOWNLOAD FAIL
+    //                                self.displayMessage(success: false, message: errorMessage)
+                                    print(errorMessage)
+                                    return
                                 }
-                            }
+                                // DOWNLOAD SUCCESS
+                                let post = self.api.convertANYtoPOST(data: result, key: "post")
+                                
+                                // we add each post we downloaded into our collection
+                                self.posts.append(post)
+                                // update the table each time a post gets downloaded
+                                self.tableView.reloadData()
+                            
+                                //need to download the image of the recently added post
+                                let index = self.posts.count - 1
+                                self.getImage(index: index)
+
+                            // SERVER ERROR
+                            case .failure(let error):
+                                print(error.errorDescription ?? "Server Error: Cannot Retrieve Post")
+                        }
+                    }
         }
+    }
+    
+    func getImage(index:Int) {
+        let parameters = api.getImageFromIdParameters(imageID: posts[index].image)
+            AF.request(api.imageFromIdURL, parameters: parameters)
+                    .validate()
+                    .responseJSON { response in
+                        switch response.result {
+                            case .success(let result):
+                                let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                                let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
+                                guard message != "fail" else {
+                                    // DOWNLOAD FAIL
+                                    print(errorMessage)
+                                    return
+                                }
+                                // DOWNLOAD SUCCESS
+                                self.posts[index].imageBase64 = self.api.convertANYtoSTRING(data: result, key: "image")
+                                
+                                // update the table each time an image gets downloaded
+                                self.tableView.reloadData()
+
+                            // SERVER ERROR
+                            case .failure(let error):
+                                print(error.errorDescription ?? "Server Error: Cannot Retrieve Image")
+                        }
+                    }
         // finish progressbar after request is retrieved
         self.progressBar.setProgress(1.0, animated: true)
     }
+    
+    //--------------------END POST DOWNLOAD--------------------------
+    
     
     @objc func refresh() {
         getPosts()
@@ -141,12 +173,12 @@ class TagPostViewController: UITableViewController {
             cell.ratingCount.text = "\(post.ratingCount) Ratings"
             
             // some checking to make sure we display proper image
-            if let imageSrc = post.image {
-                let image:UIImage = imageConverter.ToImage(imageBase64String: imageSrc)
+            if !post.imageBase64.isEmpty {
+                let image:UIImage = imageConverter.ToImage(imageBase64String: post.imageBase64)
                 cell.postImage.image = image
             }
             else {
-                cell.postImage.image = UIImage(named: "logo")
+                cell.postImage.image = UIImage(named: "no_image_light")
             }
             
             //TODO: need to implement
@@ -160,11 +192,13 @@ class TagPostViewController: UITableViewController {
     
     // handle the selected row
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedPost = posts[indexPath.row]
-        
-        if let viewController = storyboard?.instantiateViewController(identifier: "PostDetailViewController") as? PostDetailViewController {
-            viewController.post = selectedPost
-            navigationController?.pushViewController(viewController, animated: true)
+        if !posts.isEmpty {
+            let selectedPost = posts[indexPath.row]
+            
+            if let viewController = storyboard?.instantiateViewController(identifier: "PostDetailViewController") as? PostDetailViewController {
+                viewController.post = selectedPost
+                navigationController?.pushViewController(viewController, animated: true)
+            }
         }
     }
     
