@@ -151,7 +151,7 @@ class TagPostViewController: UITableViewController {
     }
     
     
-    // TABLEVIEW HANDLING
+    ///---------------START TABLE VIEW TO DISPLAY POSTS------------
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -201,6 +201,8 @@ class TagPostViewController: UITableViewController {
             }
         }
     }
+    ///---------------END TABLE VIEW TO DISPLAY POSTS------------
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

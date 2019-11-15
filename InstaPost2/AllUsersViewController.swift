@@ -56,7 +56,7 @@ class AllUsersViewController: UITableViewController {
     }
     
     
-    // TABLEVIEW HANDLING
+    ///---------------START TABLE VIEW TO DISPLAY USERS------------
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -85,6 +85,8 @@ class AllUsersViewController: UITableViewController {
             navigationController?.pushViewController(viewController, animated: true)
         }
     }
+    ///---------------END TABLE VIEW TO DISPLAY USERS------------
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

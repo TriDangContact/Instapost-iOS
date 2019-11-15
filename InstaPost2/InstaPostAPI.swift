@@ -14,6 +14,7 @@ class InstaPostAPI {
     var testURL = "https://bismarck.sdsu.edu/api/ping"
     var nicknamesURL = "https://bismarck.sdsu.edu/api/instapost-query/nicknames"
     var nicknamesExistURL = "https://bismarck.sdsu.edu/api/instapost-query/nickname-exists"
+    var authenticateURL = "https://bismarck.sdsu.edu/api/instapost-query/authenticate"
     var newUserURL = "https://bismarck.sdsu.edu/api/instapost-upload/newuser"
     var hashtagsURL = "https://bismarck.sdsu.edu/api/instapost-query/hashtags"
     var postFromIdURL = "https://bismarck.sdsu.edu/api/instapost-query/post"
@@ -27,6 +28,9 @@ class InstaPostAPI {
     var hashtagPostsURL = "https://bismarck.sdsu.edu/api/instapost-query/hashtags-post-ids"
     
     
+    func getAuthenticationParameters(email:String, password:String) -> Parameters {
+        return ["email":email, "password":password]
+    }
     
     func getNicknameExistsParameters(nickname:String) -> Parameters {
         return ["nickname":nickname]

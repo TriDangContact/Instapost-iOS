@@ -18,7 +18,7 @@ class LoginViewController: UIViewController {
     var api = InstaPostAPI()
     
     @IBOutlet weak var logoImageView: UIImageView!
-    @IBOutlet weak var usernameInput: UITextField!
+    @IBOutlet weak var emailInput: UITextField!
     @IBOutlet weak var passwordInput: UITextField!
     @IBOutlet weak var submitBtn: UIButton!
     @IBOutlet weak var registerBtn: UIButton!
@@ -49,8 +49,8 @@ class LoginViewController: UIViewController {
         
         rememberLogin.isOn = false
         
-        // let the username box get focus
-        usernameInput.becomeFirstResponder()
+        // let the input get focus
+        emailInput.becomeFirstResponder()
     }
 
     
@@ -61,23 +61,62 @@ class LoginViewController: UIViewController {
     // check credentials and log in
     @IBAction func submit(_ sender: UIButton) {
         // validate inputs
-        guard usernameInput.text == UserDefaults.standard.string(forKey: "username"), passwordInput.text == UserDefaults.standard.string(forKey: "password") else {
-            displayMessage(success: false, message: "Incorrect username/password")
+        email = emailInput.text
+        password = passwordInput.text
+        
+        guard let possibleEmail = emailInput.text, let possiblePassword = passwordInput.text else {
             return
         }
         
-        
-        // if user wants to remember their credentials
-        if rememberLogin.isOn {
-            UserDefaults.standard.set(true, forKey: "isLoggedIn")
-        } else {
-            UserDefaults.standard.set(false, forKey: "isLoggedIn")
+        guard possibleEmail.count > 0 && possiblePassword.count > 0 else {
+            displayMessage(success: false, message: "Please enter email/password")
+            return
         }
         
-        // log in
-        performSegue(withIdentifier: "LoginToMain", sender: self)
+        // authenticate with server
+        authenticate(email:possibleEmail, password:possiblePassword)
     }
     
+    func authenticate(email:String, password:String) {
+        let parameters = api.getAuthenticationParameters(email:email, password:password)
+        
+        AF.request(api.authenticateURL, parameters: parameters)
+            .validate()
+            .responseJSON { response in
+                switch response.result {
+                    case .success(let result):
+                        let dict = result as! NSDictionary
+                        let isCorrect = dict.value(forKey: "result") as! Bool
+                        guard !isCorrect else {
+                            // AUTHENTICATION FAILED
+                            self.displayMessage(success: false, message: "Incorrect email/password")
+                            return
+                        }
+                        
+                        // AUTHENTICATION SUCCESS
+                        // if user wants to remember their credentials
+                        if self.rememberLogin.isOn {
+                            UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                            
+                            // store the credentials somewhere
+                            UserDefaults.standard.set(self.email, forKey: "email")
+                            UserDefaults.standard.set(self.password, forKey: "password")
+                        } else {
+                            UserDefaults.standard.set(false, forKey: "isLoggedIn")
+                        }
+                        
+                        // log in
+                        self.performSegue(withIdentifier: "LoginToMain", sender: self)
+                
+                    case .failure(let error):
+                        print(error.errorDescription ?? "Server Error: Cannot retrieve nicknames")
+                        self.displayMessage(success: false, message: "Server Error")
+                }
+        }
+    }
+    
+    
+    //---------------START SEGUE-RELATED FUNCTIONS------------
     @IBAction func register(_ sender: UIButton) {
         performSegue(withIdentifier: "LoginToRegister", sender: self)
     }
@@ -87,7 +126,6 @@ class LoginViewController: UIViewController {
         if segue.identifier == "LoginToMain" {
             let destination = segue.destination as? MainController
             // assign the sender's data to destination's property
-            // this will allow us to highlight courses that were already selected
             destination?.email = email
             destination?.password = password
         }
@@ -109,16 +147,18 @@ class LoginViewController: UIViewController {
     @IBAction func unwindRegistration(segue:UIStoryboardSegue) {
         if let source = segue.source as? RegisterViewController {
             print("Unwinded programmatically")
-            usernameInput.text = source.usernameInput.text
+            emailInput.text = source.emailInput.text
             passwordInput.text = source.passwordInput.text
             isPWHidden = source.isPWHidden ?? true
             message.isHidden = true
         }
     }
+    //---------------END SEGUE-RELATED FUNCTIONS------------
+    
     
     func resetLogin() {
         // reset the login forms and data
-        usernameInput.text = ""
+        emailInput.text = ""
         passwordInput.text = ""
         rememberLogin.isOn = false
         UserDefaults.standard.set(false, forKey: "isLoggedIn")

@@ -104,12 +104,7 @@ class RegisterViewController: UIViewController {
                         return
                     }
                     
-                    // REGISTRATION SUCCESS, go back to login screen
-                    // temporary way to store credentials, not ideal
-                    UserDefaults.standard.set(nickname, forKey: "username")
-                    UserDefaults.standard.set(pw, forKey: "password")
-                    UserDefaults.standard.set(email, forKey: "email")
-                    
+                    // REGISTRATION SUCCESS
                     self.displayMessage(success: true, message: "Registration Successful!")
                     self.performSegue(withIdentifier: "RegisterToLogin", sender: self)
                     

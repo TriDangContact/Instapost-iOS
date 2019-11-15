@@ -91,6 +91,7 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
     }
     
     
+    //---------------START SEGUE-RELATED FUNCTIONS------------
     // using built-in unwind, pass data from source back to this controller
     @IBAction func back(unwindSegue:UIStoryboardSegue) {
         if let source = unwindSegue.source as? CreatePostViewController {
@@ -108,6 +109,8 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
             
         }
     }
+    //---------------END SEGUE-RELATED FUNCTIONS------------
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

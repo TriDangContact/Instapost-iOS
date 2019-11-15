@@ -75,6 +75,8 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         //TODO: figure out how to display all the tags
     }
 
+    
+    //---------------START SEGUE-RELATED FUNCTIONS------------
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "PostDetailToComment" {
             let destination = segue.destination as? CommentViewController
@@ -97,9 +99,11 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
             }
         }
     }
+    //---------------END SEGUE-RELATED FUNCTIONS------------
     
     
-    // TABLE VIEW TO DISPLAY COMMENTS
+    
+    ///---------------START TABLE VIEW TO DISPLAY COMMENTS------------
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
        return "Comments"
     }
@@ -118,6 +122,8 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         }
        return cell
     }
+    ///---------------END TABLE VIEW TO DISPLAY COMMENTS------------
+    
     
     
     override func didReceiveMemoryWarning() {

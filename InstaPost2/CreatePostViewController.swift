@@ -188,7 +188,7 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     
     
-    // TABLE VIEW TO DISPLAY TAGS
+    //---------------START TABLE VIEW TO DISPLAY TAGS------------
      func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return "Hashtags"
      }
@@ -207,6 +207,8 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
          }
         return cell
      }
+    //---------------END TABLE VIEW TO DISPLAY TAGS------------
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

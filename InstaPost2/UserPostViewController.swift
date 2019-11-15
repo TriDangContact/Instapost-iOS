@@ -165,7 +165,9 @@ class UserPostViewController: UITableViewController {
         return posts.count
     }
     
-    // displaying each cell in the table
+    
+    
+    ///---------------START TABLE VIEW TO DISPLAY POSTS------------
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "customPostCell", for: indexPath) as! CustomPostCell
         
@@ -182,7 +184,7 @@ class UserPostViewController: UITableViewController {
                 cell.postImage.image = image
             }
             else {
-                cell.postImage.image = UIImage(named: "logo")
+                cell.postImage.image = UIImage(named: "no_image_light")
             }
             
             //TODO: need to implement
@@ -215,6 +217,9 @@ class UserPostViewController: UITableViewController {
             }
         }
     }
+    ///---------------END TABLE VIEW TO DISPLAY POSTS------------
+    
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
