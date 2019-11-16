@@ -8,12 +8,12 @@
 
 import UIKit
 
-class PostDetailViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class PostDetailViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDataSource {
 
     let imageConverter = ImageConversion()
     var user:String?
-    var tag:String?
     var post:Post?
+    var tags = [String]()
     var comments = [String]()
     
     @IBOutlet weak var commentTableView: UITableView!
@@ -21,8 +21,9 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     @IBOutlet weak var rating: UIImageView!
     @IBOutlet weak var username: UILabel!
     @IBOutlet weak var caption: UILabel!
-    @IBOutlet weak var tagLabel: UILabel!
     @IBOutlet weak var ratingCountLabel: UILabel!
+    @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var tagCollectionView: UICollectionView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,6 +50,7 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         if !realPost.imageBase64.isEmpty {
             let image:UIImage = imageConverter.ToImage(imageBase64String: realPost.imageBase64)
             postImage.image = image
+            loadingIndicator.stopAnimating()
         }
         else {
             postImage.image = UIImage(named: "no_image_light")
@@ -56,7 +58,6 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         
         //TODO: need to implement
         // placeholder tag until proper hashtag display is implemented
-        tagLabel.text = "tag"
 //        tagLabel.text = post?.hashtags
         
     }
@@ -72,7 +73,15 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     
     func getTags() {
-        //TODO: figure out how to display all the tags
+        guard let possiblePost = post else {
+            return
+        }
+        tags = possiblePost.hashtags
+        // NEEDED FOR TAG COLLECTION VIEW
+        //refresh the data inside the collection, inside each table cell
+        tagCollectionView.contentOffset = .zero
+        tagCollectionView.reloadData()
+        
     }
 
     
@@ -124,6 +133,32 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     ///---------------END TABLE VIEW TO DISPLAY COMMENTS------------
     
+    
+    // NEEDED FOR TAG COLLECTION VIEW
+    ///---------------START COLLECTION VIEW TO DISPLAY TAGS------------
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        guard !tags.isEmpty else {
+            return 1
+        }
+        return tags.count
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "tagCollectionCell", for: indexPath) as! CustomCollectionCell
+
+        guard !tags.isEmpty else {
+            return cell
+        }
+        
+        let tag = tags[indexPath.row]
+        cell.tagLabel.text = tag
+        return cell
+    }
+    ///---------------END COLLECTION VIEW TO DISPLAY TAGS------------
     
     
     override func didReceiveMemoryWarning() {

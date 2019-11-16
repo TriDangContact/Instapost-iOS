@@ -11,6 +11,8 @@
 		0B002CDA237BE4CB008FF071 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B002CD9237BE4CB008FF071 /* User.swift */; };
 		0B002CDC237CF58B008FF071 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B002CDB237CF58B008FF071 /* ImagePicker.swift */; };
 		0B002CDE237D0009008FF071 /* ImageConversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B002CDD237D0009008FF071 /* ImageConversion.swift */; };
+		0B002CE0237F786C008FF071 /* InstapostRegex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B002CDF237F786C008FF071 /* InstapostRegex.swift */; };
+		0B002CE4237F80A2008FF071 /* CustomCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B002CE3237F80A2008FF071 /* CustomCollectionCell.swift */; };
 		0B3A844F237A57AF0051E4A9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3A844E237A57AF0051E4A9 /* AppDelegate.swift */; };
 		0B3A8451237A57AF0051E4A9 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3A8450237A57AF0051E4A9 /* SceneDelegate.swift */; };
 		0B3A8453237A57AF0051E4A9 /* MainController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3A8452237A57AF0051E4A9 /* MainController.swift */; };
@@ -60,6 +62,8 @@
 		0B002CD9237BE4CB008FF071 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		0B002CDB237CF58B008FF071 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		0B002CDD237D0009008FF071 /* ImageConversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageConversion.swift; sourceTree = "<group>"; };
+		0B002CDF237F786C008FF071 /* InstapostRegex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstapostRegex.swift; sourceTree = "<group>"; };
+		0B002CE3237F80A2008FF071 /* CustomCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCollectionCell.swift; sourceTree = "<group>"; };
 		0B3A844B237A57AF0051E4A9 /* InstaPost2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InstaPost2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B3A844E237A57AF0051E4A9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0B3A8450237A57AF0051E4A9 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -171,9 +175,11 @@
 				0B3A8490237AB50D0051E4A9 /* Comment.swift */,
 				0B002CD9237BE4CB008FF071 /* User.swift */,
 				0B3A849A237AE4610051E4A9 /* CustomPostCell.swift */,
+				0B002CE3237F80A2008FF071 /* CustomCollectionCell.swift */,
 				0B002CD7237BA98F008FF071 /* InstaPostAPI.swift */,
 				0B002CDB237CF58B008FF071 /* ImagePicker.swift */,
 				0B002CDD237D0009008FF071 /* ImageConversion.swift */,
+				0B002CDF237F786C008FF071 /* InstapostRegex.swift */,
 			);
 			path = InstaPost2;
 			sourceTree = "<group>";
@@ -464,6 +470,7 @@
 				0B002CDE237D0009008FF071 /* ImageConversion.swift in Sources */,
 				0B3A8495237ADC350051E4A9 /* UserPostViewController.swift in Sources */,
 				0B3A849B237AE4610051E4A9 /* CustomPostCell.swift in Sources */,
+				0B002CE4237F80A2008FF071 /* CustomCollectionCell.swift in Sources */,
 				0B3A8489237A72800051E4A9 /* RegisterViewController.swift in Sources */,
 				0B3A848F237AA7460051E4A9 /* PostDetailViewController.swift in Sources */,
 				0B002CDC237CF58B008FF071 /* ImagePicker.swift in Sources */,
@@ -478,6 +485,7 @@
 				0B3A848B237A74400051E4A9 /* CreatePostViewController.swift in Sources */,
 				0B3A8451237A57AF0051E4A9 /* SceneDelegate.swift in Sources */,
 				0B3A848D237AA3760051E4A9 /* Post.swift in Sources */,
+				0B002CE0237F786C008FF071 /* InstapostRegex.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

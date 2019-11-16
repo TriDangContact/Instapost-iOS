@@ -9,7 +9,7 @@
 import UIKit
 import Alamofire
 
-class TagPostViewController: UITableViewController {
+class TagPostViewController: UITableViewController, UICollectionViewDataSource {
 
     let api = InstaPostAPI()
     let imageConverter = ImageConversion()
@@ -17,6 +17,8 @@ class TagPostViewController: UITableViewController {
     var postIDs = [Int]()
     var posts = [Post]()
     
+    // NEEDED FOR TAG COLLECTION VIEW
+    var tableViewCellCoordinator = [Int: IndexPath]()
     
     @IBOutlet weak var progressBar: UIProgressView!
     
@@ -24,6 +26,11 @@ class TagPostViewController: UITableViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        // fix problem where custom cell height is not same as in IB
+        // fix problem where custom cell height is not same as in IB
+        tableView.estimatedRowHeight = 555
+        tableView.rowHeight = 555
+        
         self.navigationItem.title = tag
         
         getPostIDs()
@@ -164,6 +171,15 @@ class TagPostViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "customPostCell", for: indexPath) as! CustomPostCell
         
+        // NEEDED FOR TAG COLLECTION VIEW
+        // START TAG COLLECTIONVIEW Configuration
+        cell.tagCollectionView.dataSource = self as UICollectionViewDataSource
+        
+        let tag = tableViewCellCoordinator.count
+        cell.tagCollectionView.tag = tag
+        tableViewCellCoordinator[tag] = indexPath
+        // END TAG COLLECTIONVIEW Configuration
+        
         if !posts.isEmpty {
             let post = posts[indexPath.row]
             // a post doesn't have username associated so we can't display it
@@ -172,22 +188,32 @@ class TagPostViewController: UITableViewController {
             cell.rating.image = UIImage(named: post.ratingImage)
             cell.ratingCount.text = "\(post.ratingCount) Ratings"
             
+            // NEEDED FOR TAG COLLECTION VIEW
+            // need to load the hash tags
+    //            cell.collectionViewFlowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+            cell.tagCollectionView.reloadData()
+            
             // some checking to make sure we display proper image
             if !post.imageBase64.isEmpty {
                 let image:UIImage = imageConverter.ToImage(imageBase64String: post.imageBase64)
                 cell.postImage.image = image
+                cell.loadingIndicator.stopAnimating()
             }
             else {
                 cell.postImage.image = UIImage(named: "no_image_light")
             }
             
-            //TODO: need to implement
-            // placeholder tag until proper hashtag display is implemented
-            cell.tagLabel.text = "tag"
-//            cell.tagLabel.text = post.hashtags
-            
         }
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let cell = cell as! CustomPostCell
+        
+        // NEEDED FOR TAG COLLECTION VIEW
+        //refresh the data inside the collection, inside each table cell
+        cell.tagCollectionView.reloadData()
+        cell.tagCollectionView.contentOffset = .zero
     }
     
     // handle the selected row
@@ -202,6 +228,51 @@ class TagPostViewController: UITableViewController {
         }
     }
     ///---------------END TABLE VIEW TO DISPLAY POSTS------------
+    
+    
+    // NEEDED FOR TAG COLLECTION VIEW
+    ///---------------START COLLECTION VIEW TO DISPLAY TAGS------------
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        guard !posts.isEmpty else {
+            return 1
+        }
+        
+        // get the current cell
+//        print("Cell|| -------------------")
+        guard let indexPathCoord = tableViewCellCoordinator[collectionView.tag] else {
+            return 1
+        }
+//        let index1 = indexPathCoord[0]
+        let cellPosition = indexPathCoord[1]
+        let tagsCount = posts[cellPosition].hashtags.count
+//        print("Cell|| index1 = \(index1), cell# = \(cellPosition), count = \(tagsCount)")
+        return tagsCount
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "tagCollectionCell", for: indexPath) as! CustomCollectionCell
+
+        guard !posts.isEmpty else {
+            return cell
+        }
+
+        guard let indexPathCoord = tableViewCellCoordinator[collectionView.tag] else {
+            return cell
+        }
+        
+        let postIndex = indexPathCoord[1]
+        let tagIndex = indexPath[1]
+        let tag = posts[postIndex].hashtags[tagIndex]
+//        print("Cell|| hashtag = \(tag)")
+//        print("Cell|| postIndex = \(postIndex), tagIndex = \(tagIndex), indexPath = \(indexPath), coord = \(indexPathCoord)")
+        cell.tagLabel.text = tag
+        return cell
+    }
+    ///---------------END COLLECTION VIEW TO DISPLAY TAGS------------
     
     
     override func didReceiveMemoryWarning() {

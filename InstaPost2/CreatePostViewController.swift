@@ -59,6 +59,14 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
             return
         }
         
+        // check for anything other than letters and numbers
+        let regex = NSRegularExpression("[^A-Za-z0-9]+")
+        // matches when we found an unwanted character
+        guard !regex.matches(tag) else {
+            displayMessage(success: false, message: "Hashtag must be alphanumeric characters")
+            return
+        }
+        
         // add tag to table
         tags.append("#\(tag)")
         tagTableView.reloadData()

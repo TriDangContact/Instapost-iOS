@@ -87,9 +87,10 @@ class LoginViewController: UIViewController {
                     case .success(let result):
                         let dict = result as! NSDictionary
                         let isCorrect = dict.value(forKey: "result") as! Bool
-                        guard !isCorrect else {
+                        guard isCorrect else {
                             // AUTHENTICATION FAILED
                             self.displayMessage(success: false, message: "Incorrect email/password")
+                            print("email = \(email), pw = \(password)")
                             return
                         }
                         

@@ -14,6 +14,14 @@ class CustomPostCell: UITableViewCell {
     @IBOutlet weak var username: UILabel!
     @IBOutlet weak var caption: UILabel!
     @IBOutlet weak var rating: UIImageView!
-    @IBOutlet weak var tagLabel: UILabel!
     @IBOutlet weak var ratingCount: UILabel!
+    @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var tagCollectionView: UICollectionView!
+    @IBOutlet weak var collectionViewFlowLayout: UICollectionViewFlowLayout! {
+        didSet {
+            collectionViewFlowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        }
+    }
+    
 }
+

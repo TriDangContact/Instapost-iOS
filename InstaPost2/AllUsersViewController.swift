@@ -9,7 +9,7 @@
 import UIKit
 import Alamofire
 
-class AllUsersViewController: UITableViewController {
+class AllUsersViewController: UITableViewController  {
     
     let api = InstaPostAPI()
     var users = [String]()
