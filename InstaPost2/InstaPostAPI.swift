@@ -17,6 +17,7 @@ class InstaPostAPI {
     var authenticateURL = "https://bismarck.sdsu.edu/api/instapost-query/authenticate"
     var newUserURL = "https://bismarck.sdsu.edu/api/instapost-upload/newuser"
     var hashtagsURL = "https://bismarck.sdsu.edu/api/instapost-query/hashtags"
+    var postCountURL = "https://bismarck.sdsu.edu/api/instapost-query/post-count"
     var postIdsURL = "https://bismarck.sdsu.edu/api/instapost-query/post-ids"
     var postFromIdURL = "https://bismarck.sdsu.edu/api/instapost-query/post"
     var imageFromIdURL = "https://bismarck.sdsu.edu/api/instapost-query/image"

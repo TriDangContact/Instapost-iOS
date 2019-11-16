@@ -37,12 +37,28 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
 //        self.clearsSelectionOnViewWillAppear = false
         
         getPostIDs()
+        getPostCount()
         
         // allow user to refresh the list on pulldown
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action:  #selector(refresh), for: .valueChanged)
         self.refreshControl = refreshControl
     }
+    
+    // NOTE: If we want to map a user to their posts, we need to get a list of all users, for each user, get a list of their posts. Then we check if a user's list of ids contain a specific post's id, if so we assign that post's username as the user
+    
+//    func mapUsertoPost() {
+//        let users = ["user1": [1, 2, 3], "user2": [5,6,7]]
+//        for post in posts {
+//            for (user, ids) in users {
+//                if ids.contains(post.id) {
+//                    post.username = user
+//                }
+//            }
+//        }
+//
+//    }
+
     
     //--------------------START POST DOWNLOAD--------------------------
     // we need to download all of the user's postIDs, before we can retrieve each post
@@ -107,6 +123,8 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
                         }
             
         }
+        // finish progressbar after request is retrieved
+        self.progressBar.setProgress(1.0, animated: true)
         
     }
     
@@ -136,8 +154,22 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
                                 debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve Image")
                         }
                     }
-        // finish progressbar after request is retrieved
-        self.progressBar.setProgress(1.0, animated: true)
+    }
+    
+    func getPostCount() {
+        AF.request(api.postCountURL)
+            .validate()
+            .responseJSON { response in
+                switch response.result {
+                    case .success(let result):
+                        // DOWNLOAD SUCCESS
+                        let count = self.api.convertANYtoINT(data: result, key: "result")
+                        self.tabBarItem.title = "\(count) Posts"
+                    // SERVER ERROR
+                    case .failure(let error):
+                        debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve Post Count")
+                }
+        }
     }
     
     //--------------------END POST DOWNLOAD--------------------------
@@ -146,6 +178,7 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
     
     @objc func refresh() {
         getPostIDs()
+        getPostCount()
         refreshControl?.endRefreshing()
     }
 

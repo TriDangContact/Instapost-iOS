@@ -42,6 +42,7 @@ class AllTagsViewController: UITableViewController {
                     self.tags = self.api.convertANYtoSTRINGArray(data: result, key: "hashtags")
 //                    debugPrint(self.tags)
                     
+                    self.tabBarItem.title = "\(self.tags.count) Tags"
                     self.tableView.reloadData()
                     self.progressBar.setProgress(1.0, animated: true)
                 // SERVER ERROR

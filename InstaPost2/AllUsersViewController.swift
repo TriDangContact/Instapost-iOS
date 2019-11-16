@@ -42,6 +42,7 @@ class AllUsersViewController: UITableViewController  {
                     self.users = self.api.convertANYtoSTRINGArray(data: result, key: "nicknames")
 //                    debugPrint(self.users)
                     
+                    self.tabBarItem.title = "\(self.users.count) Users"
                     self.tableView.reloadData()
                     self.progressBar.setProgress(1.0, animated: true)
                 case .failure(let error):
