@@ -40,12 +40,12 @@ class AllUsersViewController: UITableViewController  {
             switch response.result {
                 case .success(let result):
                     self.users = self.api.convertANYtoSTRINGArray(data: result, key: "nicknames")
-//                    print(self.users)
+//                    debugPrint(self.users)
                     
                     self.tableView.reloadData()
                     self.progressBar.setProgress(1.0, animated: true)
                 case .failure(let error):
-                    print(error.errorDescription ?? "Server Error: cannot retrieve nicknames")
+                    debugPrint(error.errorDescription ?? "Server Error: cannot retrieve nicknames")
             }
         }
     }

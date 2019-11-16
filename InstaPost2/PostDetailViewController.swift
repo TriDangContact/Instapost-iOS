@@ -54,6 +54,7 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         }
         else {
             postImage.image = UIImage(named: "no_image_light")
+            loadingIndicator.stopAnimating()
         }
         
         //TODO: need to implement
@@ -81,7 +82,6 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         //refresh the data inside the collection, inside each table cell
         tagCollectionView.contentOffset = .zero
         tagCollectionView.reloadData()
-        
     }
 
     

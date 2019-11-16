@@ -22,9 +22,6 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
         //Assign self for delegate for that ViewController can respond to UITabBarControllerDelegate methods
         self.delegate = self
         
-//        print("Email in MainController: \(email)")
-//        print("PW in MainController: \(password)")
-        
         // disable default NavViewController's back button
         self.navigationItem.setHidesBackButton(true, animated:true)
         
@@ -33,7 +30,7 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
         
         // get references to each tab
         guard let viewControllers = self.viewControllers else {
-            print("No view controllers")
+            debugPrint("No view controllers")
             return
         }
         guard
@@ -41,7 +38,7 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
         let allUsersController = viewControllers[1] as? AllUsersViewController,
         let allTagsViewController = viewControllers[2] as? AllTagsViewController
         else {
-            print("No view controllers")
+            debugPrint("No view controllers")
             return
         }
         
@@ -95,8 +92,6 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
     // using built-in unwind, pass data from source back to this controller
     @IBAction func back(unwindSegue:UIStoryboardSegue) {
         if let source = unwindSegue.source as? CreatePostViewController {
-//            self.student.courses = source.coursesSelected
-            print("Back From CreatePostViewController")
         }
     }
     
@@ -104,9 +99,7 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
     // using custom unwind; pass data from source back to this controller
     @IBAction func unwindToMain(segue: UIStoryboardSegue) {
         if let source = segue.source as? CreatePostViewController {
-                    print("Back From CreatePostViewController, programmatically")
-//            source.email = self.email
-            
+                    debugPrint("Back From CreatePostViewController, programmatically")
         }
     }
     //---------------END SEGUE-RELATED FUNCTIONS------------

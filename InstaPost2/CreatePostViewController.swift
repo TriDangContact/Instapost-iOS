@@ -83,12 +83,8 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
             return
         }
         
-        // temporary email
-        email = "td2@td.com"
-        
         // validate credentials
         guard let e = email, let pw = password else {
-            print("CreatePost: Invalid credentials, email: \(email), pw: \(password)")
             return
         }
         
@@ -128,7 +124,6 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
     
     // immediately called after we have uploaded a post and given a postID
     func uploadImageToPost(email:String, password:String, postID:Int) {
-        print("PostID: \(postID)")
         
         guard imageView.image != nil else {
             self.displayMessage(success: false, message: "Please choose an image")
@@ -154,7 +149,7 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
                                 guard message != "fail" else {
                                     // UPLOAD FAIL
                                     self.displayMessage(success: false, message: "UPLOAD FAIL: \(errorMessage)")
-                                    print(errorMessage)
+                                    debugPrint(errorMessage)
                                     return
                                 }
                                 
@@ -178,7 +173,7 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
                                 
                             // SERVER ERROR
                             case .failure(let error):
-//                                print(error.errorDescription ?? "Server Error: Cannot Post")
+//                                debugPrint(error.errorDescription ?? "Server Error: Cannot Post")
                                 self.displayMessage(success: false, message: "SERVER ERROR: \(String(describing: error.errorDescription))")
                         }
                     }

@@ -15,7 +15,9 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
 //    var password:String?
     let api = InstaPostAPI()
     let imageConverter = ImageConversion()
+    var postIDs = [Int]()
     var posts = [Post]()
+    
     
     // NEEDED FOR TAG COLLECTION VIEW
     var tableViewCellCoordinator = [Int: IndexPath]()
@@ -25,9 +27,6 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        print("Email in AllPost: \(email)")
-//        print("PW in AllPost: \(password)")
-        
         // fix problem where custom cell height is not same as in IB
         tableView.estimatedRowHeight = 555
         tableView.rowHeight = 555
@@ -36,9 +35,8 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
         
         // Uncomment the following line to preserve selection between presentations
 //        self.clearsSelectionOnViewWillAppear = false
-        // Register cell classes for TagCollectionView
         
-        getPosts()
+        getPostIDs()
         
         // allow user to refresh the list on pulldown
         let refreshControl = UIRefreshControl()
@@ -46,30 +44,108 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
         self.refreshControl = refreshControl
     }
     
-    // fetch data from the server
-    func getPosts() {
-        posts = [
-            Post(id: 0, username: "name1", rating: 3.5, ratingCount: 5, text: "caption1", hashtags: ["#taggggggg1","#tag2","#tag3","#tag4","#tag5","#tag6","#tag7","#tag8","#tag9","#tag10"], comments: ["OOOOOOOOOOOOOOOOOOOO OOOOOOOOOO OOOOOOOOOO OOOOOOOOOO", "IIIIIIII IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII IIIIIIIIIIIIIIII IIIIIIII IIIIIIII IIIIIIII"]),
-            Post(id: 1, username: "name2", rating: 5, ratingCount: 5, text: "caption2", hashtags: ["#tag3"], comments: ["comment1", "comment2"]),
-            Post(id: 2, username: "name3", rating: -1, ratingCount: 5, text: "caption3", hashtags: ["#tag5","#tag6"], comments: ["comment1", "comment2"]),
-            Post(id: 3, username: "name4", rating: 1, ratingCount: 5, text: "caption4", hashtags: ["#tag7","#tag8"], comments: ["comment1", "comment2"]),
-            Post(id: 4, username: "name5", rating: 4, ratingCount: 5, text: "caption5", hashtags: ["#tag9","#tag10"], comments: ["comment1", "comment2"]),
-        ]
-        
+    //--------------------START POST DOWNLOAD--------------------------
+    // we need to download all of the user's postIDs, before we can retrieve each post
+    func getPostIDs() {
         progressBar.progress = 0.0
         progressBar.progress += 0.2
         
+        AF.request(api.postIdsURL)
+            .validate()
+            .responseJSON { response in
+                switch response.result {
+                    case .success(let result):
+                        // DOWNLOAD SUCCESS
+                        self.postIDs = self.api.convertANYtoINTArray(data: result, key: "result")
+                        // once we have our list of post ids, we download each post
+                        self.getPosts()
+                    
+                    // SERVER ERROR
+                    case .failure(let error):
+                        debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve PostIDs")
+                }
+            }
+    }
+    
+    // we download each individual posts using the list of postIDs that we downloaded
+    func getPosts() {
+        // need to retrieve each post
+        guard !postIDs.isEmpty else {
+            return
+        }
         
-        // TODO: get all posts from the server
-        
-        // finish progressbar after request is retrieved
-        self.progressBar.setProgress(1.0, animated: true)
-        
+        for id in postIDs {
+            let parameters = api.getPostFromIdParameters(postID: id)
+                AF.request(api.postFromIdURL, parameters: parameters)
+                        .validate()
+                        .responseJSON { response in
+                            switch response.result {
+                                case .success(let result):
+                                    let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                                    let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
+                                    guard message != "fail" else {
+                                        // DOWNLOAD FAIL
+                                        debugPrint(errorMessage)
+                                        return
+                                    }
+                                    // DOWNLOAD SUCCESS
+                                    let post = self.api.convertANYtoPOST(data: result, key: "post")
+                                    
+                                    // we add each post we downloaded into our collection
+                                    self.posts.append(post)
+                                    // update the table each time a post gets downloaded
+                                    self.tableView.reloadData()
+                                
+                                    //need to download the image of the recently added post
+                                    let index = self.posts.count - 1
+                                    self.getImage(index: index)
+
+                                // SERVER ERROR
+                                case .failure(let error):
+                                    debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve Post")
+                            }
+                        }
+            
+        }
         
     }
     
+    func getImage(index:Int) {
+        let parameters = api.getImageFromIdParameters(imageID: posts[index].image)
+            AF.request(api.imageFromIdURL, parameters: parameters)
+                    .validate()
+                    .responseJSON { response in
+                        switch response.result {
+                            case .success(let result):
+                                let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                                let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
+                                guard message != "fail" else {
+                                    // DOWNLOAD FAIL
+                                    debugPrint(errorMessage)
+                                    return
+                                }
+                                // DOWNLOAD SUCCESS
+                                debugPrint("User's Post Image download success")
+                                self.posts[index].imageBase64 = self.api.convertANYtoSTRING(data: result, key: "image")
+                                
+                                // update the table each time an image gets downloaded
+                                self.tableView.reloadData()
+
+                            // SERVER ERROR
+                            case .failure(let error):
+                                debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve Image")
+                        }
+                    }
+        // finish progressbar after request is retrieved
+        self.progressBar.setProgress(1.0, animated: true)
+    }
+    
+    //--------------------END POST DOWNLOAD--------------------------
+    
+    
+    
     @objc func refresh() {
-        getPosts()
+        getPostIDs()
         refreshControl?.endRefreshing()
     }
 
@@ -119,6 +195,7 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
             }
             else {
                 cell.postImage.image = UIImage(named: "no_image_light")
+                cell.loadingIndicator.stopAnimating()
             }
             
         }
@@ -160,14 +237,14 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
         }
         
         // get the current cell
-//        print("Cell|| -------------------")
+//        debugPrint("Cell|| -------------------")
         guard let indexPathCoord = tableViewCellCoordinator[collectionView.tag] else {
             return 1
         }
 //        let index1 = indexPathCoord[0]
         let cellPosition = indexPathCoord[1]
         let tagsCount = posts[cellPosition].hashtags.count
-//        print("Cell|| index1 = \(index1), cell# = \(cellPosition), count = \(tagsCount)")
+//        debugPrint("Cell|| index1 = \(index1), cell# = \(cellPosition), count = \(tagsCount)")
         return tagsCount
     }
 
@@ -185,8 +262,8 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
         let postIndex = indexPathCoord[1]
         let tagIndex = indexPath[1]
         let tag = posts[postIndex].hashtags[tagIndex]
-//        print("Cell|| hashtag = \(tag)")
-//        print("Cell|| postIndex = \(postIndex), tagIndex = \(tagIndex), indexPath = \(indexPath), coord = \(indexPathCoord)")
+//        debugPrint("Cell|| hashtag = \(tag)")
+//        debugPrint("Cell|| postIndex = \(postIndex), tagIndex = \(tagIndex), indexPath = \(indexPath), coord = \(indexPathCoord)")
         cell.tagLabel.text = tag
         return cell
     }

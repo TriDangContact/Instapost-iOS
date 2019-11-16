@@ -62,7 +62,7 @@ class UserPostViewController: UITableViewController, UICollectionViewDataSource 
                             let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
                             guard message != "fail" else {
                                 // DOWNLOAD FAIL
-                                print(errorMessage)
+                                debugPrint(errorMessage)
                                 return
                             }
                             // DOWNLOAD SUCCESS
@@ -72,7 +72,7 @@ class UserPostViewController: UITableViewController, UICollectionViewDataSource 
                         
                         // SERVER ERROR
                         case .failure(let error):
-                            print(error.errorDescription ?? "Server Error: Cannot Retrieve PostIDs")
+                            debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve PostIDs")
                     }
                 }
     }
@@ -95,7 +95,7 @@ class UserPostViewController: UITableViewController, UICollectionViewDataSource 
                                     let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
                                     guard message != "fail" else {
                                         // DOWNLOAD FAIL
-                                        print(errorMessage)
+                                        debugPrint(errorMessage)
                                         return
                                     }
                                     // DOWNLOAD SUCCESS
@@ -112,7 +112,7 @@ class UserPostViewController: UITableViewController, UICollectionViewDataSource 
 
                                 // SERVER ERROR
                                 case .failure(let error):
-                                    print(error.errorDescription ?? "Server Error: Cannot Retrieve Post")
+                                    debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve Post")
                             }
                         }
             
@@ -131,11 +131,11 @@ class UserPostViewController: UITableViewController, UICollectionViewDataSource 
                                 let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
                                 guard message != "fail" else {
                                     // DOWNLOAD FAIL
-                                    print(errorMessage)
+                                    debugPrint(errorMessage)
                                     return
                                 }
                                 // DOWNLOAD SUCCESS
-                                print("User's Post Image download success")
+                                debugPrint("User's Post Image download success")
                                 self.posts[index].imageBase64 = self.api.convertANYtoSTRING(data: result, key: "image")
                                 
                                 // update the table each time an image gets downloaded
@@ -143,7 +143,7 @@ class UserPostViewController: UITableViewController, UICollectionViewDataSource 
 
                             // SERVER ERROR
                             case .failure(let error):
-                                print(error.errorDescription ?? "Server Error: Cannot Retrieve Image")
+                                debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve Image")
                         }
                     }
         // finish progressbar after request is retrieved
@@ -155,7 +155,7 @@ class UserPostViewController: UITableViewController, UICollectionViewDataSource 
     
     
     @objc func refresh() {
-        getPosts()
+        getPostIDs()
         refreshControl?.endRefreshing()
     }
     
@@ -204,6 +204,7 @@ class UserPostViewController: UITableViewController, UICollectionViewDataSource 
             }
             else {
                 cell.postImage.image = UIImage(named: "no_image_light")
+                cell.loadingIndicator.stopAnimating()
             }
             
         } else {
@@ -253,14 +254,14 @@ class UserPostViewController: UITableViewController, UICollectionViewDataSource 
         }
         
         // get the current cell
-//        print("Cell|| -------------------")
+//        debugPrint("Cell|| -------------------")
         guard let indexPathCoord = tableViewCellCoordinator[collectionView.tag] else {
             return 1
         }
 //        let index1 = indexPathCoord[0]
         let cellPosition = indexPathCoord[1]
         let tagsCount = posts[cellPosition].hashtags.count
-//        print("Cell|| index1 = \(index1), cell# = \(cellPosition), count = \(tagsCount)")
+//        debugPrint("Cell|| index1 = \(index1), cell# = \(cellPosition), count = \(tagsCount)")
         return tagsCount
     }
 
@@ -278,8 +279,8 @@ class UserPostViewController: UITableViewController, UICollectionViewDataSource 
         let postIndex = indexPathCoord[1]
         let tagIndex = indexPath[1]
         let tag = posts[postIndex].hashtags[tagIndex]
-//        print("Cell|| hashtag = \(tag)")
-//        print("Cell|| postIndex = \(postIndex), tagIndex = \(tagIndex), indexPath = \(indexPath), coord = \(indexPathCoord)")
+//        debugPrint("Cell|| hashtag = \(tag)")
+//        debugPrint("Cell|| postIndex = \(postIndex), tagIndex = \(tagIndex), indexPath = \(indexPath), coord = \(indexPathCoord)")
         cell.tagLabel.text = tag
         return cell
     }

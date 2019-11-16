@@ -90,7 +90,6 @@ class LoginViewController: UIViewController {
                         guard isCorrect else {
                             // AUTHENTICATION FAILED
                             self.displayMessage(success: false, message: "Incorrect email/password")
-                            print("email = \(email), pw = \(password)")
                             return
                         }
                         
@@ -110,7 +109,7 @@ class LoginViewController: UIViewController {
                         self.performSegue(withIdentifier: "LoginToMain", sender: self)
                 
                     case .failure(let error):
-                        print(error.errorDescription ?? "Server Error: Cannot retrieve nicknames")
+                        debugPrint(error.errorDescription ?? "Server Error: Cannot retrieve nicknames")
                         self.displayMessage(success: false, message: "Server Error")
                 }
         }
@@ -147,7 +146,6 @@ class LoginViewController: UIViewController {
     // custom unwind
     @IBAction func unwindRegistration(segue:UIStoryboardSegue) {
         if let source = segue.source as? RegisterViewController {
-            print("Unwinded programmatically")
             emailInput.text = source.emailInput.text
             passwordInput.text = source.passwordInput.text
             isPWHidden = source.isPWHidden ?? true

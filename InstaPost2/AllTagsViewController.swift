@@ -40,13 +40,13 @@ class AllTagsViewController: UITableViewController {
             switch response.result {
                 case .success(let result):
                     self.tags = self.api.convertANYtoSTRINGArray(data: result, key: "hashtags")
-//                    print(self.tags)
+//                    debugPrint(self.tags)
                     
                     self.tableView.reloadData()
                     self.progressBar.setProgress(1.0, animated: true)
                 // SERVER ERROR
                 case .failure(let error):
-                    print(error.errorDescription ?? "Server Error: cannot retrieve nicknames")
+                    debugPrint(error.errorDescription ?? "Server Error: cannot retrieve nicknames")
             }
         }
     }

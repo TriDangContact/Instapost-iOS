@@ -83,15 +83,13 @@ class CommentViewController: UIViewController {
         }
         uploadRating(rating: rating)
         // Post the comment to the server
-        // temporary email
-        email = "td2@td.com"
         
         guard let possibleEmail = email, let pw = password, let postID = post?.id  else {
             return
         }
         
         let parameters = api.getUploadCommentParameters(email: possibleEmail, pw: pw, comment:comment, postID: postID)
-        print("Uploading Comment: email = \(possibleEmail), pw = \(pw), comment = \(comment), postid = \(postID)")
+//        debugPrint("Uploading Comment: email = \(possibleEmail), pw = \(pw), comment = \(comment), postid = \(postID)")
         AF.request(api.uploadCommentURL, method: .post, parameters: parameters, encoding: JSONEncoding.default)
             .validate()
             .responseJSON { response in
@@ -102,7 +100,7 @@ class CommentViewController: UIViewController {
                         guard message != "fail" else {
                             // UPLOAD FAIL
                             self.displayMessage(success: false, message: errorMessage)
-//                            print(errorMessage)
+//                            debugPrint(errorMessage)
                             return
                         }
                         // Upload SUCCESS
@@ -113,7 +111,7 @@ class CommentViewController: UIViewController {
                     
                     // SERVER ERROR
                     case .failure(let error):
-//                        print(error.errorDescription ?? "Server Error: Cannot Post")
+//                        debugPrint(error.errorDescription ?? "Server Error: Cannot Post")
                         self.displayMessage(success: false, message: error.errorDescription ?? "Server Error: Cannot Post Comment")
                 }
             }
@@ -139,14 +137,14 @@ class CommentViewController: UIViewController {
                         guard message != "fail" else {
                             // UPLOAD FAIL
                             self.displayMessage(success: false, message: errorMessage)
-//                            print(errorMessage)
+//                            debugPrint(errorMessage)
                             return
                         }
                         // Upload SUCCESS
                         self.displayMessage(success: true, message: "Rating Updated")
                     
                     case .failure(let error):
-//                        print(error.errorDescription ?? "Server Error: Cannot Post")
+//                        debugPrint(error.errorDescription ?? "Server Error: Cannot Post")
                         self.displayMessage(success: false, message: error.errorDescription ?? "Server Error: Cannot Post Rating")
                 }
             }

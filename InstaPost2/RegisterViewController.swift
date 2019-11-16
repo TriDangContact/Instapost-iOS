@@ -82,7 +82,7 @@ class RegisterViewController: UIViewController {
                     }
                     self.register(email: email, pw: password, first: firstname, last: lastname, nickname: username)
                 case .failure(let error):
-                    print(error.errorDescription ?? "Server Error: Cannot retrieve nicknames")
+                    debugPrint(error.errorDescription ?? "Server Error: Cannot retrieve nicknames")
                     self.displayMessage(success: false, message: "Server Error")
             }
         }
@@ -109,7 +109,7 @@ class RegisterViewController: UIViewController {
                     self.performSegue(withIdentifier: "RegisterToLogin", sender: self)
                     
                 case .failure(let error):
-                    print(error.errorDescription ?? "Server Error: Cannot register user")
+                    debugPrint(error.errorDescription ?? "Server Error: Cannot register user")
                     self.displayMessage(success: false, message: "Server Error")
                 }
         }
