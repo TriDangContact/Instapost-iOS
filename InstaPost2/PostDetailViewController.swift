@@ -46,6 +46,8 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
         username.text = user
         caption.text = post?.text
         
+        postImage.image = UIImage(named: "fetching_image_light")
+        
         // some checking to make sure we display proper image
         if !realPost.imageBase64.isEmpty {
             let image:UIImage = imageConverter.ToImage(imageBase64String: realPost.imageBase64)

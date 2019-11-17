@@ -180,6 +180,8 @@ class TagPostViewController: UITableViewController, UICollectionViewDataSource {
         tableViewCellCoordinator[tag] = indexPath
         // END TAG COLLECTIONVIEW Configuration
         
+        cell.postImage.image = UIImage(named: "fetching_image_light")
+        
         if !posts.isEmpty {
             let post = posts[indexPath.row]
             // a post doesn't have username associated so we can't display it

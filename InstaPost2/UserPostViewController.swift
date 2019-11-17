@@ -184,6 +184,8 @@ class UserPostViewController: UITableViewController, UICollectionViewDataSource 
         tableViewCellCoordinator[tag] = indexPath
         // END TAG COLLECTIONVIEW Configuration
         
+        cell.postImage.image = UIImage(named: "fetching_image_light")
+        
         if !posts.isEmpty {
             let post = posts[indexPath.row]
             cell.username.text = user
@@ -213,6 +215,7 @@ class UserPostViewController: UITableViewController, UICollectionViewDataSource 
             cell.ratingCount.text = ""
             
             cell.postImage.image = UIImage(named: "no_post_light")
+            cell.loadingIndicator.stopAnimating()
         }
         
         return cell
@@ -250,7 +253,7 @@ class UserPostViewController: UITableViewController, UICollectionViewDataSource 
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard !posts.isEmpty else {
-            return 1
+            return 0
         }
         
         // get the current cell
