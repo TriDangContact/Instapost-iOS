@@ -120,8 +120,6 @@ class CommentViewController: UIViewController {
     
     // send the rating to the server
     func uploadRating(rating:Int) {
-        // temporary email
-        email = "td2@td.com"
         
         guard let possibleEmail = email, let pw = password, let postID = post?.id  else {
             return

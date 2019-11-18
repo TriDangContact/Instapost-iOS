@@ -195,11 +195,11 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
      func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return "Hashtags"
      }
-    
+
      func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
          return tags.count
      }
-    
+
     // display each tags
      func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "createTagCell", for: indexPath)
@@ -210,6 +210,16 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
          }
         return cell
      }
+    
+    // enable deletion of tags
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            tags.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+        } else if editingStyle == .insert {
+            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
+        }
+    }
     //---------------END TABLE VIEW TO DISPLAY TAGS------------
     
     

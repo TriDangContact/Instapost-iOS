@@ -175,6 +175,13 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
     //--------------------END POST DOWNLOAD--------------------------
     
     
+    // custom unwind
+    @IBAction func unwindRegistration(segue:UIStoryboardSegue) {
+        if let source = segue.source as? CreatePostViewController {
+            getPostIDs()
+            getPostCount()
+        }
+    }
     
     @objc func refresh() {
         getPostIDs()

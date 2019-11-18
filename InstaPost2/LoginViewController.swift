@@ -97,13 +97,18 @@ class LoginViewController: UIViewController {
                         // if user wants to remember their credentials
                         if self.rememberLogin.isOn {
                             UserDefaults.standard.set(true, forKey: "isLoggedIn")
-                            
-                            // store the credentials somewhere
-                            UserDefaults.standard.set(self.email, forKey: "email")
-                            UserDefaults.standard.set(self.password, forKey: "password")
+//                            // store the credentials somewhere
+//                            UserDefaults.standard.set(email, forKey: "email")
+//                            UserDefaults.standard.set(password, forKey: "password")
                         } else {
                             UserDefaults.standard.set(false, forKey: "isLoggedIn")
                         }
+                        
+                        // store the credentials somewhere, not ideal
+                        UserDefaults.standard.set(email, forKey: "email")
+                        UserDefaults.standard.set(password, forKey: "password")
+                        self.email = email
+                        self.password = password
                         
                         // log in
                         self.performSegue(withIdentifier: "LoginToMain", sender: self)
