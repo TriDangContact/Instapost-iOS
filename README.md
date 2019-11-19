@@ -20,3 +20,8 @@ This is an iOS Mobile App that mimics some of the features of the popular social
 - iPhone 11 Pro Max
 
 # Screenshots
+| | | |
+-------------------------|-------------------------|-------------------------
+|<img src="https://github.com/TriDangContact/Instapost-iOS/blob/master/Screenshots/SS1.png?raw=true" width="150"> |<img src="https://github.com/TriDangContact/Instapost-iOS/blob/master/Screenshots/SS2.png?raw=true" width="150">| <img src="https://github.com/TriDangContact/Instapost-iOS/blob/master/Screenshots/SS3.png?raw=true" width="150"> |
+|<img src="https://github.com/TriDangContact/Instapost-iOS/blob/master/Screenshots/SS4.png?raw=true" width="150">| <img src="https://github.com/TriDangContact/Instapost-iOS/blob/master/Screenshots/SS5.png?raw=true" width="150"> | <img src="https://github.com/TriDangContact/Instapost-iOS/blob/master/Screenshots/SS6.png?raw=true" width="150">|
+|<img src="https://github.com/TriDangContact/Instapost-iOS/blob/master/Screenshots/SS7.png?raw=true" width="150"> | <img src="https://github.com/TriDangContact/Instapost-iOS/blob/master/Screenshots/SS8.png?raw=true" width="150">| <img src="https://github.com/TriDangContact/Instapost-iOS/blob/master/Screenshots/SS9.png?raw=true" width="150"> | 
