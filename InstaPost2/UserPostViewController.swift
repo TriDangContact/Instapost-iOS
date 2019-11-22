@@ -91,6 +91,8 @@ class UserPostViewController: UITableViewController, UICollectionViewDataSource 
                 }
                 // DOWNLOAD SUCCESS
                 self.postIDs = self.api.convertANYtoINTArray(data: result, key: "ids")
+                // recent posts on are on top
+                postIDs.reverse()
                 // once we have our list of post ids, we download each post
                 self.getPosts()
             
@@ -217,15 +219,27 @@ class UserPostViewController: UITableViewController, UICollectionViewDataSource 
             cell.tagCollectionView.reloadData()
             
             // some checking to make sure we display proper image
-            if !post.imageBase64.isEmpty {
-                let image:UIImage = imageConverter.ToImage(imageBase64String: post.imageBase64)
-                cell.postImage.image = image
-                cell.loadingIndicator.stopAnimating()
+            // still fetching data
+            if post.image == -2 {
+                cell.postImage.image = UIImage(named: "fetching_image_light")
+                cell.loadingIndicator.startAnimating()
             }
-            else {
+            // no image
+            else if post.image == -1 {
                 cell.postImage.image = UIImage(named: "no_image_light")
                 cell.loadingIndicator.stopAnimating()
-                self.navigationItem.title = self.user
+            } else {
+                // there's image but still loading
+                if post.imageBase64.isEmpty {
+                    cell.postImage.image = UIImage(named: "fetching_image_light")
+                    cell.loadingIndicator.startAnimating()
+                }
+                // there's image and done loading
+                else {
+                    let image:UIImage = imageConverter.ToImage(imageBase64String: post.imageBase64)
+                    cell.postImage.image = image
+                    cell.loadingIndicator.stopAnimating()
+                }
             }
             
         } else {
@@ -235,7 +249,7 @@ class UserPostViewController: UITableViewController, UICollectionViewDataSource 
             
             cell.postImage.image = UIImage(named: "no_post_light")
             cell.loadingIndicator.stopAnimating()
-            self.navigationItem.title = self.user
+//            self.navigationItem.title = self.user
         }
         
         return cell

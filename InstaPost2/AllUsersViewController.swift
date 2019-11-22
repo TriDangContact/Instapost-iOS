@@ -20,6 +20,10 @@ class AllUsersViewController: UITableViewController  {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
+        // simple workaround to prevent long loading time
+        api.stopAllCurrentAPIRequests()
+        
         getUsers()
         
         // allow user to refresh the list on pulldown
@@ -52,12 +56,19 @@ class AllUsersViewController: UITableViewController  {
         tableView.setContentOffset(offset, animated: true)
     }
     
+    func showLoading(show:Bool){
+        UIView.animate(withDuration: 10.0) {
+            self.progressBar.setProgress(1.0, animated: true)
+        }
+    }
+    
     
     //-------------------- START API REQUEST --------------------------
     // fetch data from the server
     func getUsers() {
-        progressBar.progress = 0.0
-        progressBar.progress += 0.2
+//        progressBar.progress = 0.0
+//        progressBar.progress += 0.2
+        showLoading(show:true)
         
         api.getNicknames(completionHandler: getNicknamesCallback)
     }

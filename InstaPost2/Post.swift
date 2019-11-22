@@ -12,7 +12,7 @@ import UIKit
 struct Post {
     var id:Int = -1
     var username:String = ""
-    var image:Int = -1
+    var image:Int = -2
     var imageBase64:String = ""
     var rating:Double?
     var ratingCount:Int = -1

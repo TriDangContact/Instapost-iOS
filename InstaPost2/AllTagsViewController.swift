@@ -20,6 +20,10 @@ class AllTagsViewController: UITableViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
+        // simple workaround to prevent long loading time
+        api.stopAllCurrentAPIRequests()
+        
         getTagss()
         
         // allow user to refresh the list on pulldown

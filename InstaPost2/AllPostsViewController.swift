@@ -94,6 +94,8 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
             case .success(let result):
                 // DOWNLOAD SUCCESS
                 self.postIDs = self.api.convertANYtoINTArray(data: result, key: "result")
+                // recent posts on are on top
+                postIDs.reverse()
                 // once we have our list of post ids, we download each post
                 self.getPosts()
             
@@ -232,14 +234,27 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
             cell.tagCollectionView.reloadData()
             
             // some checking to make sure we display proper image
-            if !post.imageBase64.isEmpty {
-                let image:UIImage = imageConverter.ToImage(imageBase64String: post.imageBase64)
-                cell.postImage.image = image
-                cell.loadingIndicator.stopAnimating()
+            // still fetching data
+            if post.image == -2 {
+                cell.postImage.image = UIImage(named: "fetching_image_light")
+                cell.loadingIndicator.startAnimating()
             }
-            else {
+            // no image
+            else if post.image == -1 {
                 cell.postImage.image = UIImage(named: "no_image_light")
                 cell.loadingIndicator.stopAnimating()
+            } else {
+                // there's image but still loading
+                if post.imageBase64.isEmpty {
+                    cell.postImage.image = UIImage(named: "fetching_image_light")
+                    cell.loadingIndicator.startAnimating()
+                }
+                // there's image and done loading
+                else {
+                    let image:UIImage = imageConverter.ToImage(imageBase64String: post.imageBase64)
+                    cell.postImage.image = image
+                    cell.loadingIndicator.stopAnimating()
+                }
             }
             
         }
