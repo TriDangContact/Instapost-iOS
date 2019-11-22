@@ -213,6 +213,7 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
         // NEEDED FOR TAG COLLECTION VIEW
         // START TAG COLLECTIONVIEW Configuration
         cell.tagCollectionView.dataSource = self as UICollectionViewDataSource
+//        cell.collectionViewFlowLayout.estimatedItemSize = CGSize(width: 100.0, height: 50.0)
         
         let tag = tableViewCellCoordinator.count
         cell.tagCollectionView.tag = tag
@@ -268,7 +269,7 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
         // NEEDED FOR TAG COLLECTION VIEW
         //refresh the data inside the collection, inside each table cell
         cell.tagCollectionView.reloadData()
-        cell.tagCollectionView.contentOffset = .zero
+//        cell.tagCollectionView.contentOffset = .zero
     }
     
     // handle the selected row

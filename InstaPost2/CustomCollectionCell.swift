@@ -11,4 +11,5 @@ import UIKit
 
 class CustomCollectionCell: UICollectionViewCell {
     @IBOutlet weak var tagLabel: UILabel!
+    @IBOutlet weak var tagBtn: UIButton!
 }

@@ -19,7 +19,7 @@ class CustomPostCell: UITableViewCell {
     @IBOutlet weak var tagCollectionView: UICollectionView!
     @IBOutlet weak var collectionViewFlowLayout: UICollectionViewFlowLayout! {
         didSet {
-            collectionViewFlowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+            collectionViewFlowLayout.estimatedItemSize = CGSize(width: 120.0,height: 20.0)
         }
     }
     
