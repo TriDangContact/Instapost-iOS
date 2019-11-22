@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Alamofire
 
 class MainController: UITabBarController, UITabBarControllerDelegate {
 
@@ -35,8 +36,8 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
         }
         guard
             let allPostsController = viewControllers[0] as? AllPostsViewController,
-        let allUsersController = viewControllers[1] as? AllUsersViewController,
-        let allTagsViewController = viewControllers[2] as? AllTagsViewController
+            let allUsersController = viewControllers[1] as? AllUsersViewController,
+            let allTagsViewController = viewControllers[2] as? AllTagsViewController
         else {
             debugPrint("No view controllers")
             return
@@ -72,6 +73,7 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
         }
     }
     
+    //---------------START SEGUE-RELATED FUNCTIONS------------
     @IBAction func createPost(_ sender: UIBarButtonItem) {
         performSegue(withIdentifier: "MainToCreate", sender: self)
     }
@@ -81,14 +83,11 @@ class MainController: UITabBarController, UITabBarControllerDelegate {
         if segue.identifier == "MainToCreate" {
             let destination = segue.destination as? CreatePostViewController
             // assign the sender's data to destination's property
-            // this will allow us to highlight courses that were already selected
-            destination?.email = self.email
-            destination?.password = self.password
+//            destination?.email = self.email
+//            destination?.password = self.password
         }
     }
     
-    
-    //---------------START SEGUE-RELATED FUNCTIONS------------
     // using built-in unwind, pass data from source back to this controller
     @IBAction func back(unwindSegue:UIStoryboardSegue) {
         if let source = unwindSegue.source as? CreatePostViewController {

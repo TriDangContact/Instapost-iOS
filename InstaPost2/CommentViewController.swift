@@ -62,11 +62,14 @@ class CommentViewController: UIViewController {
         let roundedValue = round(sender.value / ratingStep) * ratingStep
         sender.value = roundedValue
         
-        // Do something else with the value
         let rating = Int(sender.value / ratingStep) + 1
         ratingLabel.text = String(rating)
         
-        uploadRating(rating: rating)
+        // Post the comment to the server
+        guard let possibleEmail = email, let pw = password, let postID = post?.id  else {
+            return
+        }
+        api.uploadRating(email: possibleEmail, pw: pw, rating: rating, postID: postID, completionHandler: uploadRatingCallback)
     }
     
     @IBAction func submit(_ sender: UIButton) {
@@ -81,71 +84,61 @@ class CommentViewController: UIViewController {
         guard let rating = Int(ratingLabel.text ?? "-1") else {
             return
         }
-        uploadRating(rating: rating)
+//        uploadRating(rating: rating)
+
         // Post the comment to the server
-        
         guard let possibleEmail = email, let pw = password, let postID = post?.id  else {
             return
         }
-        
-        let parameters = api.getUploadCommentParameters(email: possibleEmail, pw: pw, comment:comment, postID: postID)
-//        debugPrint("Uploading Comment: email = \(possibleEmail), pw = \(pw), comment = \(comment), postid = \(postID)")
-        AF.request(api.uploadCommentURL, method: .post, parameters: parameters, encoding: JSONEncoding.default)
-            .validate()
-            .responseJSON { response in
-                switch response.result {
-                    case .success(let result):
-                        let message = self.api.convertANYtoSTRING(data: result, key: "result")
-                        let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
-                        guard message != "fail" else {
-                            // UPLOAD FAIL
-                            self.displayMessage(success: false, message: errorMessage)
-//                            debugPrint(errorMessage)
-                            return
-                        }
-                        // Upload SUCCESS
-                        
-                        // workaround to let us update the comment section in PostDetail
-                        self.submittedComment = comment
-                        self.performSegue(withIdentifier: "CommentToPostDetail", sender: self)
-                    
-                    // SERVER ERROR
-                    case .failure(let error):
-//                        debugPrint(error.errorDescription ?? "Server Error: Cannot Post")
-                        self.displayMessage(success: false, message: error.errorDescription ?? "Server Error: Cannot Post Comment")
-                }
-            }
+        api.uploadRating(email: possibleEmail, pw: pw, rating: rating, postID: postID, completionHandler: uploadRatingCallback)
+        api.uploadComment(email: possibleEmail, pw: pw, comment: comment, postID: postID, completionHandler: uploadCommentCallback)
     }
     
-    
-    // send the rating to the server
-    func uploadRating(rating:Int) {
-        
-        guard let possibleEmail = email, let pw = password, let postID = post?.id  else {
-            return
-        }
-        let parameters = api.getUploadRatingParameters(email: possibleEmail, pw: pw, rating: rating, postID: postID)
-        AF.request(api.uploadRatingURL, method: .post, parameters: parameters, encoding: JSONEncoding.default)
-            .validate()
-            .responseJSON { response in
-                switch response.result {
-                    case .success(let result):
-                        let message = self.api.convertANYtoSTRING(data: result, key: "result")
-                        let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
-                        guard message != "fail" else {
-                            // UPLOAD FAIL
-                            self.displayMessage(success: false, message: errorMessage)
-//                            debugPrint(errorMessage)
-                            return
-                        }
-                        // Upload SUCCESS
-                        self.displayMessage(success: true, message: "Rating Updated")
-                    
-                    case .failure(let error):
-//                        debugPrint(error.errorDescription ?? "Server Error: Cannot Post")
-                        self.displayMessage(success: false, message: error.errorDescription ?? "Server Error: Cannot Post Rating")
+    func uploadCommentCallback(response: AFDataResponse<Any>) ->Void {
+        switch response.result {
+            case .success(let result):
+                let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
+                guard message != "fail" else {
+                    // UPLOAD FAIL
+                    self.displayMessage(success: false, message: errorMessage)
+                    debugPrint(errorMessage)
+                    return
                 }
-            }
+                // Upload SUCCESS
+                
+                // workaround to let us update the comment section in PostDetail
+                guard let comment = commentInput.text else {
+                    return
+                }
+                self.submittedComment = comment
+                self.performSegue(withIdentifier: "CommentToPostDetail", sender: self)
+            
+            // SERVER ERROR
+            case .failure(let error):
+                debugPrint("Server Error: \(error.errorDescription ?? "Server Error: Cannot Post")")
+                self.displayMessage(success: false, message: error.errorDescription ?? "Server Error: Cannot Post Comment")
+        }
+    }
+    
+    func uploadRatingCallback(response: AFDataResponse<Any>) ->Void {
+        switch response.result {
+            case .success(let result):
+                let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
+                guard message != "fail" else {
+                    // UPLOAD FAIL
+                    self.displayMessage(success: false, message: errorMessage)
+    //                  debugPrint(errorMessage)
+                    return
+                }
+                // Upload SUCCESS
+                self.displayMessage(success: true, message: "Rating Updated")
+            
+            case .failure(let error):
+    //              debugPrint(error.errorDescription ?? "Server Error: Cannot Post")
+                self.displayMessage(success: false, message: error.errorDescription ?? "Server Error: Cannot Post Rating")
+        }
     }
     
     func displayMessage(success:Bool, message: String) {

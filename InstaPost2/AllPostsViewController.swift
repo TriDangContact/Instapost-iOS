@@ -32,10 +32,6 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
         tableView.rowHeight = 555
 //        tableView.rowHeight = UITableView.automaticDimension
         
-        
-        // Uncomment the following line to preserve selection between presentations
-//        self.clearsSelectionOnViewWillAppear = false
-        
         getPostIDs()
         getPostCount()
         
@@ -46,41 +42,65 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
     }
     
     // NOTE: If we want to map a user to their posts, we need to get a list of all users, for each user, get a list of their posts. Then we check if a user's list of ids contain a specific post's id, if so we assign that post's username as the user
-    
-//    func mapUsertoPost() {
-//        let users = ["user1": [1, 2, 3], "user2": [5,6,7]]
-//        for post in posts {
-//            for (user, ids) in users {
-//                if ids.contains(post.id) {
-//                    post.username = user
-//                }
-//            }
-//        }
-//
-//    }
 
+    // allow user to scroll to top by shaking
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        debugPrint("Shaken")
+        scrollToTop()
+    }
     
-    //--------------------START POST DOWNLOAD--------------------------
+    func scrollToTop() {
+        var offset = CGPoint(
+            x: -tableView.contentInset.left,
+            y: -tableView.contentInset.top)
+
+        if #available(iOS 11.0, *) {
+            offset = CGPoint(
+                x: -tableView.adjustedContentInset.left,
+                y: -tableView.adjustedContentInset.top)
+        }
+        tableView.setContentOffset(offset, animated: true)
+    }
+    
+    @objc func refresh() {
+        getPostIDs()
+        getPostCount()
+        refreshControl?.endRefreshing()
+    }
+
+    override func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
+        debugPrint("Scroll: Decelerating")
+    }
+    
+    // custom unwind
+    @IBAction func unwindRegistration(segue:UIStoryboardSegue) {
+        if let source = segue.source as? CreatePostViewController {
+            getPostIDs()
+            getPostCount()
+        }
+    }
+    
+    //-------------------- START API REQUEST --------------------------
     // we need to download all of the user's postIDs, before we can retrieve each post
     func getPostIDs() {
         progressBar.progress = 0.0
         progressBar.progress += 0.2
         
-        AF.request(api.postIdsURL)
-            .validate()
-            .responseJSON { response in
-                switch response.result {
-                    case .success(let result):
-                        // DOWNLOAD SUCCESS
-                        self.postIDs = self.api.convertANYtoINTArray(data: result, key: "result")
-                        // once we have our list of post ids, we download each post
-                        self.getPosts()
-                    
-                    // SERVER ERROR
-                    case .failure(let error):
-                        debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve PostIDs")
-                }
-            }
+        api.getPostIDs(completionHandler:getPostIDsCallback)
+    }
+    
+    func getPostIDsCallback(response: AFDataResponse<Any>) ->Void {
+        switch response.result {
+            case .success(let result):
+                // DOWNLOAD SUCCESS
+                self.postIDs = self.api.convertANYtoINTArray(data: result, key: "result")
+                // once we have our list of post ids, we download each post
+                self.getPosts()
+            
+            // SERVER ERROR
+            case .failure(let error):
+                debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve PostIDs")
+        }
     }
     
     // we download each individual posts using the list of postIDs that we downloaded
@@ -91,107 +111,91 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
         }
         
         for id in postIDs {
-            let parameters = api.getPostFromIdParameters(postID: id)
-                AF.request(api.postFromIdURL, parameters: parameters)
-                        .validate()
-                        .responseJSON { response in
-                            switch response.result {
-                                case .success(let result):
-                                    let message = self.api.convertANYtoSTRING(data: result, key: "result")
-                                    let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
-                                    guard message != "fail" else {
-                                        // DOWNLOAD FAIL
-                                        debugPrint(errorMessage)
-                                        return
-                                    }
-                                    // DOWNLOAD SUCCESS
-                                    let post = self.api.convertANYtoPOST(data: result, key: "post")
-                                    
-                                    // we add each post we downloaded into our collection
-                                    self.posts.append(post)
-                                    // update the table each time a post gets downloaded
-                                    self.tableView.reloadData()
-                                
-                                    //need to download the image of the recently added post
-                                    let index = self.posts.count - 1
-                                    self.getImage(index: index)
-
-                                // SERVER ERROR
-                                case .failure(let error):
-                                    debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve Post")
-                            }
-                        }
-            
+            api.getPost(postID: id, completionHandler: getPostCallback)
         }
         // finish progressbar after request is retrieved
         self.progressBar.setProgress(1.0, animated: true)
         
     }
     
+    func getPostCallback(response: AFDataResponse<Any>) ->Void {
+        switch response.result {
+            case .success(let result):
+                let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
+                guard message != "fail" else {
+                    // DOWNLOAD FAIL
+                    debugPrint(errorMessage)
+                    return
+                }
+                // DOWNLOAD SUCCESS
+                let post = self.api.convertANYtoPOST(data: result, key: "post")
+                
+                // we add each post we downloaded into our collection
+                self.posts.append(post)
+                // update the table each time a post gets downloaded
+                self.tableView.reloadData()
+            
+                //need to download the image of the recently added post
+                let index = self.posts.count - 1
+                self.getImage(index: index)
+
+            // SERVER ERROR
+            case .failure(let error):
+                debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve Post")
+        }
+    }
+    
     func getImage(index:Int) {
+        // need to make manual request since we need the index for async call
         let parameters = api.getImageFromIdParameters(imageID: posts[index].image)
             AF.request(api.imageFromIdURL, parameters: parameters)
-                    .validate()
-                    .responseJSON { response in
-                        switch response.result {
-                            case .success(let result):
-                                let message = self.api.convertANYtoSTRING(data: result, key: "result")
-                                let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
-                                guard message != "fail" else {
-                                    // DOWNLOAD FAIL
-                                    debugPrint(errorMessage)
-                                    return
-                                }
-                                // DOWNLOAD SUCCESS
-                                debugPrint("User's Post Image download success")
-                                self.posts[index].imageBase64 = self.api.convertANYtoSTRING(data: result, key: "image")
-                                
-                                // update the table each time an image gets downloaded
-                                self.tableView.reloadData()
+                .validate()
+                .responseJSON { response in
+                    switch response.result {
+                        case .success(let result):
+                            let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                            let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
+                            guard message != "fail" else {
+                                // DOWNLOAD FAIL
+                                debugPrint(errorMessage)
+                                return
+                            }
+                            // DOWNLOAD SUCCESS
+                            debugPrint("User's Post Image download success")
+                            self.posts[index].imageBase64 = self.api.convertANYtoSTRING(data: result, key: "image")
+                            
+                            // update the table each time an image gets downloaded
+                            self.tableView.reloadData()
 
-                            // SERVER ERROR
-                            case .failure(let error):
-                                debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve Image")
-                        }
+                        // SERVER ERROR
+                        case .failure(let error):
+                            debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve Image")
                     }
+                }
     }
     
     func getPostCount() {
-        AF.request(api.postCountURL)
-            .validate()
-            .responseJSON { response in
-                switch response.result {
-                    case .success(let result):
-                        // DOWNLOAD SUCCESS
-                        let count = self.api.convertANYtoINT(data: result, key: "result")
-                        self.tabBarItem.title = "\(count) Posts"
-                    // SERVER ERROR
-                    case .failure(let error):
-                        debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve Post Count")
-                }
+        api.getPostCount(completionHandler: getPostCountCallback)
+    }
+    
+    func getPostCountCallback(response: AFDataResponse<Any>) ->Void {
+        switch response.result {
+            case .success(let result):
+                // DOWNLOAD SUCCESS
+                let count = self.api.convertANYtoINT(data: result, key: "result")
+                self.tabBarItem.title = "\(count) Posts"
+            // SERVER ERROR
+            case .failure(let error):
+                debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve Post Count")
         }
     }
     
-    //--------------------END POST DOWNLOAD--------------------------
+    //-------------------- END API REQUEST --------------------------
     
     
-    // custom unwind
-    @IBAction func unwindRegistration(segue:UIStoryboardSegue) {
-        if let source = segue.source as? CreatePostViewController {
-            getPostIDs()
-            getPostCount()
-        }
-    }
     
-    @objc func refresh() {
-        getPostIDs()
-        getPostCount()
-        refreshControl?.endRefreshing()
-    }
-
-    
-    
-    ///---------------START TABLE VIEW TO DISPLAY POSTS------------
+    //---------------START TABLE VIEW TO DISPLAY POSTS------------
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -203,7 +207,6 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
     // displaying each cell in the table
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "customPostCell", for: indexPath) as! CustomPostCell
-        
         
         // NEEDED FOR TAG COLLECTION VIEW
         // START TAG COLLECTIONVIEW Configuration
@@ -263,11 +266,11 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
             navigationController?.pushViewController(viewController, animated: true)
         }
     }
-    ///---------------END TABLE VIEW TO DISPLAY POSTS------------
+    //---------------END TABLE VIEW TO DISPLAY POSTS------------
     
     
     // NEEDED FOR TAG COLLECTION VIEW
-    ///---------------START COLLECTION VIEW TO DISPLAY TAGS------------
+    //---------------START COLLECTION VIEW TO DISPLAY TAGS------------
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
@@ -310,8 +313,7 @@ class AllPostsViewController: UITableViewController, UICollectionViewDataSource 
     }
     
     
-    ///---------------END COLLECTION VIEW TO DISPLAY TAGS------------
-    
+    //---------------END COLLECTION VIEW TO DISPLAY TAGS------------
     
     
     

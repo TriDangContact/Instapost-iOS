@@ -352,6 +352,7 @@
                                     </constraints>
                                     <viewLayoutGuide key="safeArea" id="YiX-fa-DIF"/>
                                 </tableViewCellContentView>
+                                <gestureRecognizers/>
                                 <connections>
                                     <outlet property="caption" destination="iIf-EL-lFx" id="kdA-0G-bZZ"/>
                                     <outlet property="collectionViewFlowLayout" destination="AJk-e0-ei6" id="eoC-Bd-KZS"/>

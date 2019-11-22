@@ -27,11 +27,8 @@ class TagPostViewController: UITableViewController, UICollectionViewDataSource {
 
         // Do any additional setup after loading the view.
         // fix problem where custom cell height is not same as in IB
-        // fix problem where custom cell height is not same as in IB
         tableView.estimatedRowHeight = 555
         tableView.rowHeight = 555
-        
-        self.navigationItem.title = tag
         
         getPostIDs()
         getPosts()
@@ -48,34 +45,34 @@ class TagPostViewController: UITableViewController, UICollectionViewDataSource {
     func getPostIDs() {
         progressBar.progress = 0.0
         progressBar.progress += 0.2
+        self.navigationItem.title = "Loading..."
                 
         guard let hashtag = tag else {
             return
         }
         
-        let parameters = api.getHashtagPostsParameters(hashtag: hashtag)
-        AF.request(api.hashtagPostsURL, parameters: parameters)
-                .validate()
-                .responseJSON { response in
-                    switch response.result {
-                        case .success(let result):
-                            let message = self.api.convertANYtoSTRING(data: result, key: "result")
-                            let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
-                            guard message != "fail" else {
-                                // DOWNLOAD FAIL
-                                debugPrint(errorMessage)
-                                return
-                            }
-                            // DOWNLOAD SUCCESS
-                            self.postIDs = self.api.convertANYtoINTArray(data: result, key: "ids")
-                            // once we have our list of post ids, we download each post
-                            self.getPosts()
-                        
-                        // SERVER ERROR
-                        case .failure(let error):
-                            debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve PostIDs")
-                    }
+        api.getHashtagPosts(hashtag: hashtag, completionHandler: getHashtagPostsCallback)
+    }
+    
+    func getHashtagPostsCallback(response: AFDataResponse<Any>) ->Void {
+        switch response.result {
+            case .success(let result):
+                let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
+                guard message != "fail" else {
+                    // DOWNLOAD FAIL
+                    debugPrint(errorMessage)
+                    return
                 }
+                // DOWNLOAD SUCCESS
+                self.postIDs = self.api.convertANYtoINTArray(data: result, key: "ids")
+                // once we have our list of post ids, we download each post
+                self.getPosts()
+            
+            // SERVER ERROR
+            case .failure(let error):
+                debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve PostIDs")
+        }
     }
     
     // we download each individual posts using the list of postIDs that we downloaded
@@ -86,41 +83,41 @@ class TagPostViewController: UITableViewController, UICollectionViewDataSource {
         }
         
         for id in postIDs {
-            let parameters = api.getPostFromIdParameters(postID: id)
-            AF.request(api.postFromIdURL, parameters: parameters)
-                    .validate()
-                    .responseJSON { response in
-                        switch response.result {
-                            case .success(let result):
-                                let message = self.api.convertANYtoSTRING(data: result, key: "result")
-                                let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
-                                guard message != "fail" else {
-                                    // DOWNLOAD FAIL
-    //                                self.displayMessage(success: false, message: errorMessage)
-                                    debugPrint(errorMessage)
-                                    return
-                                }
-                                // DOWNLOAD SUCCESS
-                                let post = self.api.convertANYtoPOST(data: result, key: "post")
-                                
-                                // we add each post we downloaded into our collection
-                                self.posts.append(post)
-                                // update the table each time a post gets downloaded
-                                self.tableView.reloadData()
-                            
-                                //need to download the image of the recently added post
-                                let index = self.posts.count - 1
-                                self.getImage(index: index)
+            api.getPost(postID: id, completionHandler: getPostCallback)
+        }
+    }
+    
+    func getPostCallback(response: AFDataResponse<Any>) ->Void {
+        switch response.result {
+            case .success(let result):
+                let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
+                guard message != "fail" else {
+                    // DOWNLOAD FAIL
+//                                self.displayMessage(success: false, message: errorMessage)
+                    debugPrint(errorMessage)
+                    return
+                }
+                // DOWNLOAD SUCCESS
+                let post = self.api.convertANYtoPOST(data: result, key: "post")
+                
+                // we add each post we downloaded into our collection
+                self.posts.append(post)
+                // update the table each time a post gets downloaded
+                self.tableView.reloadData()
+            
+                //need to download the image of the recently added post
+                let index = self.posts.count - 1
+                self.getImage(index: index)
 
-                            // SERVER ERROR
-                            case .failure(let error):
-                                debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve Post")
-                        }
-                    }
+            // SERVER ERROR
+            case .failure(let error):
+                debugPrint(error.errorDescription ?? "Server Error: Cannot Retrieve Post")
         }
     }
     
     func getImage(index:Int) {
+        // need to make manual request since we need the index for async call
         let parameters = api.getImageFromIdParameters(imageID: posts[index].image)
             AF.request(api.imageFromIdURL, parameters: parameters)
                     .validate()
@@ -139,6 +136,7 @@ class TagPostViewController: UITableViewController, UICollectionViewDataSource {
                                 
                                 // update the table each time an image gets downloaded
                                 self.tableView.reloadData()
+                            
 
                             // SERVER ERROR
                             case .failure(let error):
@@ -147,6 +145,7 @@ class TagPostViewController: UITableViewController, UICollectionViewDataSource {
                     }
         // finish progressbar after request is retrieved
         self.progressBar.setProgress(1.0, animated: true)
+        self.navigationItem.title = self.tag
     }
     
     //--------------------END POST DOWNLOAD--------------------------
@@ -155,6 +154,25 @@ class TagPostViewController: UITableViewController, UICollectionViewDataSource {
     @objc func refresh() {
         getPostIDs()
         refreshControl?.endRefreshing()
+    }
+    
+    // allow user to scroll to top by shaking
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        debugPrint("Shaken")
+        scrollToTop()
+    }
+    
+    func scrollToTop() {
+        var offset = CGPoint(
+            x: -tableView.contentInset.left,
+            y: -tableView.contentInset.top)
+
+        if #available(iOS 11.0, *) {
+            offset = CGPoint(
+                x: -tableView.adjustedContentInset.left,
+                y: -tableView.adjustedContentInset.top)
+        }
+        tableView.setContentOffset(offset, animated: true)
     }
     
     

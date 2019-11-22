@@ -78,6 +78,100 @@ class InstaPostAPI {
         return ["email":email, "password":pw, "rating":rating, "post-id": postID]
     }
     
+    
+    //------------- CUSTOM API CALLS -------------
+    func checkNicknamesExist(nickname: String, completionHandler: @escaping (AFDataResponse<Any>) -> Void) {
+        let parameters = getNicknameExistsParameters(nickname: nickname)
+        POSTRequest(url: nicknamesExistURL, param: parameters, completion: completionHandler)
+    }
+    
+    func authenticate(email:String, password:String, completionHandler: @escaping (AFDataResponse<Any>) -> Void) {
+        let parameters = getAuthenticationParameters(email:email, password:password)
+        POSTRequest(url: authenticateURL, param: parameters, completion: completionHandler)
+    }
+    
+    func getNicknames(completionHandler: @escaping (AFDataResponse<Any>) -> Void) {
+        GETRequest(url: nicknamesURL, completion: completionHandler)
+    }
+    
+    func getHashtags(completionHandler: @escaping (AFDataResponse<Any>) -> Void) {
+        GETRequest(url: hashtagsURL, completion: completionHandler)
+    }
+    
+    func getPostIDs(completionHandler: @escaping (AFDataResponse<Any>) -> Void) {
+        GETRequest(url: postIdsURL, completion: completionHandler)
+    }
+    
+    func getPost(postID: Int, completionHandler: @escaping (AFDataResponse<Any>) -> Void) {
+        let parameters = getPostFromIdParameters(postID: postID)
+        POSTRequest(url: postFromIdURL, param: parameters, completion: completionHandler)
+    }
+    
+    func getPostCount(completionHandler: @escaping (AFDataResponse<Any>) -> Void) {
+        GETRequest(url: postCountURL, completion: completionHandler)
+    }
+    
+    func getNicknamePosts(nickname: String, completionHandler: @escaping (AFDataResponse<Any>) -> Void) {
+        let parameters = getNicknamePostsParameters(nickname: nickname)
+        POSTRequest(url: nicknamePostsURL, param: parameters, completion: completionHandler)
+    }
+    
+    func getHashtagPosts(hashtag: String, completionHandler: @escaping (AFDataResponse<Any>) -> Void) {
+        let parameters = getHashtagPostsParameters(hashtag: hashtag)
+        POSTRequest(url: hashtagPostsURL, param: parameters, completion: completionHandler)
+    }
+    
+    
+    func newUser(email:String, pw:String, first:String, last:String, nickname:String, completionHandler: @escaping (AFDataResponse<Any>) -> Void) {
+        let parameters = getNewUserParameters(first: first, last: last, nickname: nickname, email: email, pw: pw)
+        POSTRequest(url: newUserURL, param: parameters, completion: completionHandler)
+    }
+
+    func uploadPost(email:String, password:String, caption: String, tags:[String], completionHandler: @escaping (AFDataResponse<Any>) -> Void) {
+        let parameters = getUploadPostParameters(email: email, pw: password, text: caption, tags: tags)
+        POSTRequestEncoded(url: uploadPostURL, param: parameters, completion: completionHandler)
+    }
+    
+    func uploadImage(email:String, password:String, postID:Int, imageString:String, completionHandler: @escaping (AFDataResponse<Any>) -> Void) {
+        let parameters = getUploadImageParameters(email: email, pw: password, image:imageString, postID: postID)
+        POSTRequestEncoded(url: uploadImageURL, param: parameters, completion: completionHandler)
+    }
+    
+    func uploadComment(email: String, pw: String, comment:String, postID: Int, completionHandler: @escaping (AFDataResponse<Any>) -> Void) {
+        let parameters = getUploadCommentParameters(email: email, pw: pw, comment: comment, postID: postID)
+        POSTRequestEncoded(url: uploadCommentURL, param: parameters, completion: completionHandler)
+    }
+    
+    func uploadRating(email: String, pw: String, rating: Int, postID: Int, completionHandler: @escaping (AFDataResponse<Any>) -> Void) {
+        let parameters = getUploadRatingParameters(email: email, pw: pw, rating: rating, postID: postID)
+        POSTRequestEncoded(url: uploadRatingURL, param: parameters, completion: completionHandler)
+    }
+    
+    //------------- END CUSTOM API CALLS -------------
+    
+    
+    //------------- START GENERIC REQUESTS -------------
+    func GETRequest(url:String, completion: @escaping (AFDataResponse<Any>) -> Void) {
+        AF.request(url).validate().responseJSON { response in
+            completion(response)
+        }
+    }
+    
+    func POSTRequest(url:String, param:Parameters, completion: @escaping (AFDataResponse<Any>) -> Void) {
+        AF.request(url, parameters: param).validate().responseJSON { response in
+            completion(response)
+        }
+    }
+    
+    func POSTRequestEncoded(url:String, param:Parameters, completion: @escaping (AFDataResponse<Any>) -> Void) {
+        AF.request(url, method: .post, parameters: param, encoding: JSONEncoding.default).validate().responseJSON { response in
+            completion(response)
+        }
+    }
+    //------------- END GENERIC REQUESTS -------------
+    
+    
+    //------------- START CONVERSION HELPERS -------------
     func convertANYtoSTRING(data: Any, key:String) -> String {
         var result = ""
         let jsonDict:NSDictionary = data as! NSDictionary
@@ -153,6 +247,8 @@ class InstaPostAPI {
         }
         return result
     }
+    
+    //------------- END CONVERSION HELPERS -------------
     
     
     

@@ -28,37 +28,62 @@ class AllTagsViewController: UITableViewController {
         self.refreshControl = refreshControl
     }
     
+    @objc func refresh() {
+        getTagss()
+        refreshControl?.endRefreshing()
+    }
+    
+    // allow user to scroll to top by shaking
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        debugPrint("Shaken")
+        scrollToTop()
+    }
+    
+    func scrollToTop() {
+        var offset = CGPoint(
+            x: -tableView.contentInset.left,
+            y: -tableView.contentInset.top)
+
+        if #available(iOS 11.0, *) {
+            offset = CGPoint(
+                x: -tableView.adjustedContentInset.left,
+                y: -tableView.adjustedContentInset.top)
+        }
+        tableView.setContentOffset(offset, animated: true)
+    }
+    
+    
+    //-------------------- START API REQUEST --------------------------
     // fetch data from the server
     func getTagss() {
 //        tags = ["tag1", "tag2", "tag3"]
         progressBar.progress = 0.0
         progressBar.progress += 0.2
         
-        AF.request(api.hashtagsURL)
-        .validate()
-        .responseJSON { response in
-            switch response.result {
-                case .success(let result):
-                    self.tags = self.api.convertANYtoSTRINGArray(data: result, key: "hashtags")
-//                    debugPrint(self.tags)
-                    
-                    self.tabBarItem.title = "\(self.tags.count) Tags"
-                    self.tableView.reloadData()
-                    self.progressBar.setProgress(1.0, animated: true)
-                // SERVER ERROR
-                case .failure(let error):
-                    debugPrint(error.errorDescription ?? "Server Error: cannot retrieve nicknames")
-            }
+        api.getHashtags(completionHandler: getHashtagsCallback)
+    }
+    
+// callback function that gets called after async request is completed
+    func getHashtagsCallback(response: AFDataResponse<Any>) ->Void {
+        switch response.result {
+            case .success(let result):
+                self.tags = self.api.convertANYtoSTRINGArray(data: result, key: "hashtags")
+//                  debugPrint(self.tags)
+                
+                self.tabBarItem.title = "\(self.tags.count) Tags"
+                self.tableView.reloadData()
+                self.progressBar.setProgress(1.0, animated: true)
+            // SERVER ERROR
+            case .failure(let error):
+                debugPrint(error.errorDescription ?? "Server Error: cannot retrieve nicknames")
         }
     }
     
-    @objc func refresh() {
-        getTagss()
-        refreshControl?.endRefreshing()
-    }
+    //-------------------- END API REQUEST --------------------------
+    
     
 
-    ///---------------START TABLE VIEW TO DISPLAY TAGS------------
+    //---------------START TABLE VIEW TO DISPLAY TAGS------------
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -87,7 +112,7 @@ class AllTagsViewController: UITableViewController {
             navigationController?.pushViewController(viewController, animated: true)
         }
     }
-    ///---------------END TABLE VIEW TO DISPLAY TAGS------------
+    //---------------END TABLE VIEW TO DISPLAY TAGS------------
     
     
     override func didReceiveMemoryWarning() {

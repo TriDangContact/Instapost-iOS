@@ -74,51 +74,49 @@ class LoginViewController: UIViewController {
         }
         
         // authenticate with server
-        authenticate(email:possibleEmail, password:possiblePassword)
+        api.authenticate(email:possibleEmail, password:possiblePassword, completionHandler: authenticateCallback)
     }
     
-    func authenticate(email:String, password:String) {
-        let parameters = api.getAuthenticationParameters(email:email, password:password)
-        
-        AF.request(api.authenticateURL, parameters: parameters)
-            .validate()
-            .responseJSON { response in
-                switch response.result {
-                    case .success(let result):
-                        let dict = result as! NSDictionary
-                        let isCorrect = dict.value(forKey: "result") as! Bool
-                        guard isCorrect else {
-                            // AUTHENTICATION FAILED
-                            self.displayMessage(success: false, message: "Incorrect email/password")
-                            return
-                        }
-                        
-                        // AUTHENTICATION SUCCESS
-                        // if user wants to remember their credentials
-                        if self.rememberLogin.isOn {
-                            UserDefaults.standard.set(true, forKey: "isLoggedIn")
-//                            // store the credentials somewhere
-//                            UserDefaults.standard.set(email, forKey: "email")
-//                            UserDefaults.standard.set(password, forKey: "password")
-                        } else {
-                            UserDefaults.standard.set(false, forKey: "isLoggedIn")
-                        }
-                        
-                        // store the credentials somewhere, not ideal
-                        UserDefaults.standard.set(email, forKey: "email")
-                        UserDefaults.standard.set(password, forKey: "password")
-                        self.email = email
-                        self.password = password
-                        
-                        // log in
-                        self.performSegue(withIdentifier: "LoginToMain", sender: self)
-                
-                    case .failure(let error):
-                        debugPrint(error.errorDescription ?? "Server Error: Cannot retrieve nicknames")
-                        self.displayMessage(success: false, message: "Server Error")
+    
+    //-------------------- START API REQUEST --------------------------
+    func authenticateCallback(response: AFDataResponse<Any>) ->Void {
+        switch response.result {
+            case .success(let result):
+                let dict = result as! NSDictionary
+                let isCorrect = dict.value(forKey: "result") as! Bool
+                guard isCorrect else {
+                    // AUTHENTICATION FAILED
+                    self.displayMessage(success: false, message: "Incorrect email/password")
+                    return
                 }
+                
+                // AUTHENTICATION SUCCESS
+                // if user wants to remember their credentials
+                if self.rememberLogin.isOn {
+                    UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                } else {
+                    UserDefaults.standard.set(false, forKey: "isLoggedIn")
+                }
+                
+                // store the credentials somewhere, not ideal
+                guard let possibleEmail = emailInput.text, let possiblePassword = passwordInput.text else {
+                    return
+                }
+                UserDefaults.standard.set(possibleEmail, forKey: "email")
+                UserDefaults.standard.set(possiblePassword, forKey: "password")
+                self.email = possibleEmail
+                self.password = possiblePassword
+                
+                // log in
+                self.performSegue(withIdentifier: "LoginToMain", sender: self)
+        
+            case .failure(let error):
+                debugPrint(error.errorDescription ?? "Server Error: Cannot retrieve nicknames")
+                self.displayMessage(success: false, message: "Server Error")
         }
     }
+    
+    //-------------------- END API REQUEST --------------------------
     
     
     //---------------START SEGUE-RELATED FUNCTIONS------------
@@ -184,6 +182,5 @@ class LoginViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
     
 }

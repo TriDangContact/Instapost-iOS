@@ -28,36 +28,58 @@ class AllUsersViewController: UITableViewController  {
         self.refreshControl = refreshControl
     }
     
-    // fetch data from the server
-    func getUsers() {
-//        users = ["user1", "user2", "user3"]
-        progressBar.progress = 0.0
-        progressBar.progress += 0.2
-        
-        AF.request(api.nicknamesURL)
-        .validate()
-        .responseJSON { response in
-            switch response.result {
-                case .success(let result):
-                    self.users = self.api.convertANYtoSTRINGArray(data: result, key: "nicknames")
-//                    debugPrint(self.users)
-                    
-                    self.tabBarItem.title = "\(self.users.count) Users"
-                    self.tableView.reloadData()
-                    self.progressBar.setProgress(1.0, animated: true)
-                case .failure(let error):
-                    debugPrint(error.errorDescription ?? "Server Error: cannot retrieve nicknames")
-            }
-        }
-    }
-    
     @objc func refresh() {
         getUsers()
         refreshControl?.endRefreshing()
     }
     
+    // allow user to scroll to top by shaking
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        debugPrint("Shaken")
+        scrollToTop()
+    }
     
-    ///---------------START TABLE VIEW TO DISPLAY USERS------------
+    func scrollToTop() {
+        var offset = CGPoint(
+            x: -tableView.contentInset.left,
+            y: -tableView.contentInset.top)
+
+        if #available(iOS 11.0, *) {
+            offset = CGPoint(
+                x: -tableView.adjustedContentInset.left,
+                y: -tableView.adjustedContentInset.top)
+        }
+        tableView.setContentOffset(offset, animated: true)
+    }
+    
+    
+    //-------------------- START API REQUEST --------------------------
+    // fetch data from the server
+    func getUsers() {
+        progressBar.progress = 0.0
+        progressBar.progress += 0.2
+        
+        api.getNicknames(completionHandler: getNicknamesCallback)
+    }
+    
+    // callback function that gets called after async request is completed
+    func getNicknamesCallback(response: AFDataResponse<Any>) ->Void {
+        switch response.result {
+            case .success(let result):
+                self.users = self.api.convertANYtoSTRINGArray(data: result, key: "nicknames")
+//                  debugPrint(self.users)
+                
+                self.tabBarItem.title = "\(self.users.count) Users"
+                self.tableView.reloadData()
+                self.progressBar.setProgress(1.0, animated: true)
+            case .failure(let error):
+                debugPrint(error.errorDescription ?? "Server Error: cannot retrieve nicknames")
+        }
+    }
+    //-------------------- END API REQUEST --------------------------
+    
+    
+    //---------------START TABLE VIEW TO DISPLAY USERS------------
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -86,7 +108,7 @@ class AllUsersViewController: UITableViewController  {
             navigationController?.pushViewController(viewController, animated: true)
         }
     }
-    ///---------------END TABLE VIEW TO DISPLAY USERS------------
+    //---------------END TABLE VIEW TO DISPLAY USERS------------
     
     
     override func didReceiveMemoryWarning() {

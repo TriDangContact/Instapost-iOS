@@ -91,36 +91,39 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
         uploadPost(email: e, password: pw, caption: caption)
     }
     
+    
+    //-------------------- START API REQUEST --------------------------
     func uploadPost(email:String, password:String, caption: String) {
         progressBar.progress = 0.0
         progressBar.progress += 0.2
         
-        let parameters = api.getUploadPostParameters(email: email, pw: password, text: caption, tags: tags)
-        
-        AF.request(api.uploadPostURL, method: .post, parameters: parameters, encoding: JSONEncoding.default)
-            .validate()
-            .responseJSON { response in
-                switch response.result {
-                    case .success(let result):
-                        let message = self.api.convertANYtoSTRING(data: result, key: "result")
-                        let postID = self.api.convertANYtoINT(data: result, key: "id")
-                        let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
-                        guard message != "fail" else {
-                            // REGISTRATION FAIL
-                            self.displayMessage(success: false, message: errorMessage)
-                            return
-                        }
-                        
-                        // Post SUCCESS
-                        // we can how use the generated post ID to upload it's image
-                        self.uploadImageToPost(email: email, password: password, postID: postID)
-                        
-                    case .failure(let error):
-                        self.displayMessage(success: false, message: error.errorDescription ?? "Server Error: Cannot Post")
-                }
-            }
+        api.uploadPost(email: email, password: password, caption: caption, tags: tags, completionHandler: uploadPostCallback)
     }
     
+    func uploadPostCallback(response: AFDataResponse<Any>) ->Void {
+        switch response.result {
+            case .success(let result):
+                let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                let postID = self.api.convertANYtoINT(data: result, key: "id")
+                let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
+                guard message != "fail" else {
+                    // Post UPLOAD FAIL
+                    self.displayMessage(success: false, message: errorMessage)
+                    return
+                }
+                
+                // Post UPLOAD SUCCESS
+                // we can how use the generated post ID to upload it's image
+                // validate credentials
+                guard let e = email, let pw = password else {
+                    return
+                }
+                self.uploadImageToPost(email: e, password: pw, postID: postID)
+                
+            case .failure(let error):
+                self.displayMessage(success: false, message: error.errorDescription ?? "Server Error: Cannot Post")
+        }
+    }
     
     // immediately called after we have uploaded a post and given a postID
     func uploadImageToPost(email:String, password:String, postID:Int) {
@@ -138,57 +141,44 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
         let imageString = imageConverter.ToBase64String(img: image)
         
         // upload image to post on server
-        let parameters = api.getUploadImageParameters(email: email, pw: password, image:imageString, postID: postID)
-                AF.request(api.uploadImageURL, method: .post, parameters: parameters, encoding: JSONEncoding.default)
-                    .validate()
-                    .responseJSON { response in
-                        switch response.result {
-                            case .success(let result):
-                                let message = self.api.convertANYtoSTRING(data: result, key: "result")
-                                let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
-                                guard message != "fail" else {
-                                    // UPLOAD FAIL
-                                    self.displayMessage(success: false, message: "UPLOAD FAIL: \(errorMessage)")
-                                    debugPrint(errorMessage)
-                                    return
-                                }
-                                
-                                // Upload SUCCESS
-                                // finish progressbar after request is retrieved
-                                self.progressBar.setProgress(1.0, animated: true)
-                                self.displayMessage(success: true, message: "Upload Successful!")
-                                // give a small delay so user can see successful posting
-                                var countdown = 3
-                                let timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-                                    countdown-=1
-                                    if countdown == 0 {
-                                        timer.invalidate()
-                                        // custom unwind segue
-                                        self.performSegue(withIdentifier: "CreateToMain", sender: self)
-                                    }
-                                }
-                                
-                                
-                                
-                                
-                            // SERVER ERROR
-                            case .failure(let error):
-//                                debugPrint(error.errorDescription ?? "Server Error: Cannot Post")
-                                self.displayMessage(success: false, message: "SERVER ERROR: \(String(describing: error.errorDescription))")
-                        }
-                    }
+        api.uploadImage(email: email, password: password,  postID: postID, imageString:imageString, completionHandler: uploadImageCallback)
     }
     
-    func displayMessage(success:Bool, message: String) {
-        if success {
-            self.message.textColor = #colorLiteral(red: 0.005956960255, green: 0.5896615933, blue: 0.1788459191, alpha: 1)
-            
-        } else {
-            self.message.textColor = #colorLiteral(red: 1, green: 0.1039071781, blue: 0.0251960371, alpha: 1)
+    func uploadImageCallback(response: AFDataResponse<Any>) ->Void {
+        switch response.result {
+            case .success(let result):
+                let message = self.api.convertANYtoSTRING(data: result, key: "result")
+                let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
+                guard message != "fail" else {
+                    // UPLOAD FAIL
+                    self.displayMessage(success: false, message: "UPLOAD FAIL: \(errorMessage)")
+                    debugPrint(errorMessage)
+                    return
+                }
+                
+                // Upload SUCCESS
+                // finish progressbar after request is retrieved
+                self.progressBar.setProgress(1.0, animated: true)
+                self.displayMessage(success: true, message: "Upload Successful!")
+                // give a small delay so user can see successful posting
+                var countdown = 3
+                let timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+                    countdown-=1
+                    if countdown == 0 {
+                        timer.invalidate()
+                        // custom unwind segue
+                        self.performSegue(withIdentifier: "CreateToMain", sender: self)
+                    }
+                }
+                
+            // SERVER ERROR
+            case .failure(let error):
+//                debugPrint(error.errorDescription ?? "Server Error: Cannot Post")
+                self.displayMessage(success: false, message: "SERVER ERROR: \(String(describing: error.errorDescription))")
         }
-        self.message.text = message
-        self.message.isHidden = false
     }
+    
+    //-------------------- END API REQUEST --------------------------
     
     
     //---------------START TABLE VIEW TO DISPLAY TAGS------------
@@ -222,6 +212,17 @@ class CreatePostViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     //---------------END TABLE VIEW TO DISPLAY TAGS------------
     
+    
+    func displayMessage(success:Bool, message: String) {
+        if success {
+            self.message.textColor = #colorLiteral(red: 0.005956960255, green: 0.5896615933, blue: 0.1788459191, alpha: 1)
+            
+        } else {
+            self.message.textColor = #colorLiteral(red: 1, green: 0.1039071781, blue: 0.0251960371, alpha: 1)
+        }
+        self.message.text = message
+        self.message.isHidden = false
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

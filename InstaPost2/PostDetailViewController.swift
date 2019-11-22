@@ -58,11 +58,6 @@ class PostDetailViewController: UIViewController, UITableViewDelegate, UITableVi
             postImage.image = UIImage(named: "no_image_light")
             loadingIndicator.stopAnimating()
         }
-        
-        //TODO: need to implement
-        // placeholder tag until proper hashtag display is implemented
-//        tagLabel.text = post?.hashtags
-        
     }
     
     func getComments() {

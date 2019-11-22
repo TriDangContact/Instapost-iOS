@@ -65,55 +65,58 @@ class RegisterViewController: UIViewController {
             return
         }
         
-        
-        // check for existing nickname
-        let param = api.getNicknameExistsParameters(nickname: username)
-        
-        AF.request(api.nicknamesExistURL, parameters: param)
-        .validate()
-        .responseJSON { response in
-            switch response.result {
-                case .success(let result):
-                    let dict = result as! NSDictionary
-                    let exists = dict.value(forKey: "result") as! Bool
-                    guard !exists else {
-                        self.displayMessage(success: false, message: "Username already exists")
-                        return
-                    }
-                    self.register(email: email, pw: password, first: firstname, last: lastname, nickname: username)
-                case .failure(let error):
-                    debugPrint(error.errorDescription ?? "Server Error: Cannot retrieve nicknames")
-                    self.displayMessage(success: false, message: "Server Error")
-            }
+        api.checkNicknamesExist(nickname: username, completionHandler: checkNicknamesExistCallback)
+    }
+    
+    //-------------------- START API REQUEST --------------------------
+    func checkNicknamesExistCallback(response: AFDataResponse<Any>) ->Void {
+        switch response.result {
+            case .success(let result):
+                let dict = result as! NSDictionary
+                let exists = dict.value(forKey: "result") as! Bool
+                guard !exists else {
+                    self.displayMessage(success: false, message: "Username already exists")
+                    return
+                }
+                guard let email = emailInput.text,
+                    let password = passwordInput.text,
+                    let firstname = firstnameInput.text,
+                    let lastname = lastnameInput.text,
+                    let username = usernameInput.text else {
+                        self.displayMessage(success: false, message: "Invalid inputs")
+                    return
+                }
+                
+                // we can now register the user if the nickname doesn't exist yet
+                api.newUser(email: email, pw: password, first: firstname, last: lastname, nickname: username, completionHandler: newUserCallback)
+            case .failure(let error):
+                debugPrint(error.errorDescription ?? "Server Error: Cannot retrieve nicknames")
+                self.displayMessage(success: false, message: "Server Error in Check Username")
         }
     }
     
-    func register(email:String, pw:String, first:String, last:String, nickname:String) {
-        let parameters = api.getNewUserParameters(first: first, last: last, nickname: nickname, email: email, pw: pw)
-        
-        AF.request(api.newUserURL, parameters: parameters)
-            .validate()
-            .responseJSON { response in
-                switch response.result {
-                case .success(let result):
-                    let message = self.api.convertANYtoSTRING(data: result, key: "result")
-                    let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
-                    guard message != "fail" else {
-                        // REGISTRATION FAIL
-                        self.displayMessage(success: false, message: errorMessage)
-                        return
-                    }
-                    
-                    // REGISTRATION SUCCESS
-                    self.displayMessage(success: true, message: "Registration Successful!")
-                    self.performSegue(withIdentifier: "RegisterToLogin", sender: self)
-                    
-                case .failure(let error):
-                    debugPrint(error.errorDescription ?? "Server Error: Cannot register user")
-                    self.displayMessage(success: false, message: "Server Error")
-                }
+    func newUserCallback(response: AFDataResponse<Any>) ->Void {
+        switch response.result {
+        case .success(let result):
+            let message = self.api.convertANYtoSTRING(data: result, key: "result")
+            let errorMessage = self.api.convertANYtoSTRING(data: result, key: "errors")
+            guard message != "fail" else {
+                // REGISTRATION FAIL
+                self.displayMessage(success: false, message: errorMessage)
+                return
+            }
+            
+            // REGISTRATION SUCCESS
+            self.displayMessage(success: true, message: "Registration Successful!")
+            self.performSegue(withIdentifier: "RegisterToLogin", sender: self)
+            
+        case .failure(let error):
+            debugPrint(error.errorDescription ?? "Server Error: Cannot register user")
+            self.displayMessage(success: false, message: "Server Error in Registration")
         }
     }
+    
+    //-------------------- END API REQUEST --------------------------
     
     func displayMessage(success:Bool, message: String) {
         if success {
